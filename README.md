@@ -1,0 +1,1 @@
+# syslog-analyzer-core
