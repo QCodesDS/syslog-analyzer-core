@@ -255,7 +255,413 @@ Hệ thống hỗ trợ 2 chế độ hoạt động quay lại quay lui:
 
 ```
 
-## 📂 Cấu trúc thư mục chi tiết
+## � Kỹ thuật Xử lý và Triển khai Chi tiết
+
+### 1️⃣ Kỹ thuật xử lý Luồng dữ liệu (Data Pipeline)
+
+#### **Incremental Reading (Đọc tiếp nối)**
+
+Thay vì tải toàn bộ file log vào RAM (tốn bộ nhớ, chậm), chúng ta đọc dần từng phần:
+
+```cpp
+// Sử dụng con trỏ file (seekg/tellg) để nhớ vị trí cuối cùng
+class LogReader {
+private:
+    std::ifstream file;
+    std::streampos lastPos = 0;  // Lưu vị trí đọc
+    
+public:
+    std::vector<Log> readNewLogs() {
+        file.seekg(lastPos);     // Quay về vị trí cuối
+        // Đọc từ lastPos đến cuối file
+        // ...
+        lastPos = file.tellg();  // Cập nhật vị trí mới
+        return newLogs;
+    }
+};
+```
+
+**Lợi ích:**
+- ✅ Xử lý file log "vô tận" mà không lo tràn RAM
+- ✅ Độ trễ thấp (< 1s) thay vì 30s để tải toàn bộ
+- ✅ Khả năng real-time monitoring
+
+#### **Polling (Thăm dò)**
+
+Vòng lặp chính sử dụng `while(true)` kết hợp với `sleep()` để duy trì trạng thái "luôn sẵn sàng":
+
+```cpp
+// main.cpp - Main loop
+while (true) {
+    // Thăm dò dữ liệu mới
+    if (reader.hasNewLogs()) {
+        std::vector<Log> logs = reader.readNewLogs();
+        analyzer.process(logs);
+    }
+    
+    // Tránh "nóng CPU" bằng sleep
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
+```
+
+**Tính chất:**
+- Hệ thống luôn "sẵn sàng" đón nhận dữ liệu mới
+- Sleep tránh lãng phí CPU (không polling quá tần số)
+
+#### **Batch Processing (Xử lý theo lô)**
+
+Đọc và xử lý log theo batch (ví dụ 100 dòng/lần) để cân bằng hiệu năng:
+
+```cpp
+const size_t BATCH_SIZE = 100;  // Đọc 100 dòng/lần
+
+while (reader.hasNext()) {
+    std::vector<Log> batch = reader.readBatch(BATCH_SIZE);
+    
+    // Xử lý batch ngay (ko chờ)
+    for (const auto& log : batch) {
+        analyzer.add(log);
+        monitor.check(log);
+    }
+    
+    // Cân bằng: không quá tải (100 dòng) nhưng cũng không bị tồn đọng
+}
+```
+
+**Ưu điểm:**
+- ⚖️ Cân bằng giữa hiệu năng (batch processing) và độ trễ (không bị tồn lâu)
+- 🎯 Cho phép xử lý song song trên từng batch (future enhancement)
+
+---
+
+### 2️⃣ Kỹ thuật xử lý Cấu trúc dữ liệu (DSA Integration)
+
+#### **Phân tầng dữ liệu (Composite Architecture)**
+
+Kết hợp nhiều cấu trúc dữ liệu để giải quyết từng bài toán cụ thể:
+
+- **Trie**: Quét từ khóa lỗi (Prefix Matching) với độ phức tạp $O(L)$, nhanh hơn bất kỳ thuật toán duyệt chuỗi nào.
+  ```cpp
+  // Ví dụ: Tìm từ khóa "ERROR" hoặc "TIMEOUT"
+  Trie<char> errorKeywords;
+  errorKeywords.insert("ERROR");
+  errorKeywords.insert("TIMEOUT");
+  errorKeywords.insert("FATAL");
+  
+  // Tìm kiếm O(L) với L = độ dài string
+  if (errorKeywords.search("ERROR")) { /* Cảnh báo */ }
+  ```
+
+- **HashTable**: Thống kê số lỗi theo `serviceID` với truy xuất $O(1)$.
+  ```cpp
+  // Đếm lỗi từng service
+  HashTable<std::string, int> serviceErrors;
+  
+  for (const auto& log : logs) {
+      if (log.level == "ERROR") {
+          serviceErrors[log.serviceID]++;  // O(1)
+      }
+  }
+  
+  // Tìm service nào bị lỗi nhiều nhất
+  int maxErrors = 0;
+  for (const auto& [service, count] : serviceErrors) {
+      if (count > maxErrors) maxErrors = count;
+  }
+  ```
+
+- **PriorityQueue**: Quản lý hàng đợi cảnh báo, đảm bảo lỗi `FATAL` luôn được xử lý sớm nhất.
+  ```cpp
+  // Priority: FATAL(3) > CRITICAL(2) > ERROR(1)
+  PriorityQueue<Log> alertQueue;
+  
+  for (const auto& log : logs) {
+      alertQueue.push(log, getPriority(log.level));
+  }
+  
+  // Pop theo ưu tiên
+  while (!alertQueue.empty()) {
+      Log alert = alertQueue.pop();  // Lấy cái có priority cao nhất
+      notifier.send(alert);
+  }
+  ```
+
+- **AVL Tree** (kế thừa từ BST): Lưu trữ log theo dải thời gian (`range search`), cho phép tìm lại các lỗi trong khoảng thời gian cụ thể cực nhanh.
+  ```cpp
+  // Tìm log trong khoảng thời gian [start_time, end_time]
+  AVLTree<time_t, Log> timeIndex;
+  
+  std::vector<Log> recentErrors = timeIndex.rangeQuery(start_time, end_time);
+  // Độ phức tạp: O(log n + k) với k = số kết quả
+  ```
+
+#### **Stateful Analysis (Phân tích có trạng thái)**
+
+Hệ thống không "quên" dữ liệu cũ. Việc kết hợp dữ liệu giữa các batch khác nhau thông qua `HashTable` giúp phát hiện hành vi tấn công (ví dụ: Brute Force) dù lỗi nằm rải rác ở các lần đọc khác nhau:
+
+```cpp
+// Phát hiện Brute Force Attack: 10+ lỗi authentication trong 1 phút
+HashTable<std::string, std::vector<time_t>> authFailures;
+
+for (const auto& log : batch) {
+    if (log.message.find("Authentication Failed") != std::string::npos) {
+        authFailures[log.serviceID].push_back(log.timestamp);
+    }
+}
+
+// Kiểm tra: có bao nhiêu lần thất bại trong 60 giây gần nhất?
+for (const auto& [service, times] : authFailures) {
+    int recentCount = 0;
+    time_t now = std::time(nullptr);
+    for (time_t t : times) {
+        if (now - t < 60) recentCount++;
+    }
+    
+    if (recentCount >= 10) {
+        notifier.alert("Possible Brute Force Attack on " + service);
+    }
+}
+```
+
+---
+
+### 3️⃣ Kỹ thuật UI/UX và Giao diện (Terminal Dashboard)
+
+#### **State Machine (Máy trạng thái)**
+
+Chuyển đổi giữa chế độ `Live Monitor` và `Statistics View` mà không cần tắt/mở lại chương trình:
+
+```cpp
+// app/processing/LogMonitor.h
+enum class UIMode {
+    LIVE = 0,           // 🟢 Hiển thị real-time
+    STATISTICS = 1      // 📊 Hiển thị báo cáo thống kê
+};
+
+class LogMonitor {
+private:
+    UIMode currentMode = UIMode::LIVE;
+    
+public:
+    void switchMode() {
+        if (currentMode == UIMode::LIVE) {
+            currentMode = UIMode::STATISTICS;
+        } else {
+            currentMode = UIMode::LIVE;
+        }
+        refreshDisplay();
+    }
+    
+    void display() {
+        if (currentMode == UIMode::LIVE) {
+            displayLiveMode();
+        } else {
+            displayStatisticsMode();
+        }
+    }
+};
+```
+
+#### **Non-blocking Input (Nhập liệu không chặn)**
+
+Sử dụng kỹ thuật kiểm tra phím bấm (như `kbhit` hoặc `signal`) để người dùng có thể thoát hoặc chuyển chế độ bằng phím tắt ngay trong vòng lặp chính:
+
+```cpp
+// main.cpp - Main loop
+while (true) {
+    // Xử lý dữ liệu (không bị chặn)
+    if (reader.hasNewLogs()) {
+        std::vector<Log> logs = reader.readNewLogs();
+        analyzer.process(logs);
+    }
+    
+    // Kiểm tra phím bấm (non-blocking)
+    if (_kbhit()) {
+        int key = _getch();
+        if (key == 'S' || key == 's') {
+            monitor.switchMode();  // [S] = Switch mode
+        } else if (key == 'Q' || key == 'q') {
+            break;  // [Q] = Quit
+        }
+    }
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
+```
+
+#### **Visual Alerting (Cảnh báo thị giác)**
+
+Sử dụng ANSI Escape Codes để tô màu cho log, giúp người quản trị "liếc mắt" là thấy sự cố:
+
+```cpp
+// app/output/AlertNotifier.h
+const char* COLOR_RED = "\033[1;31m";      // Đỏ (FATAL)
+const char* COLOR_YELLOW = "\033[1;33m";   // Vàng (WARNING)
+const char* COLOR_GREEN = "\033[1;32m";    // Xanh (OK)
+const char* COLOR_RESET = "\033[0m";       // Reset
+
+void AlertNotifier::display(const Log& log) {
+    std::string color;
+    
+    if (log.level == "FATAL") {
+        color = COLOR_RED;
+    } else if (log.level == "WARNING") {
+        color = COLOR_YELLOW;
+    } else {
+        color = COLOR_GREEN;
+    }
+    
+    std::cout << color << "[" << log.timestamp << "] " 
+              << log.level << ": " << log.message 
+              << COLOR_RESET << std::endl;
+}
+```
+
+#### **Clean-screen Dashboard (Bảng điều khiển tĩnh)**
+
+Sử dụng `system("clear/cls")` kết hợp in lại toàn bộ khung bảng điều khiển để tạo hiệu ứng Dashboard tĩnh:
+
+```cpp
+void LogMonitor::displayLiveMode() {
+    system("clear");  // Linux/macOS
+    // system("cls");  // Windows
+    
+    std::cout << "╔════════════════════════════════════════════════╗\n";
+    std::cout << "║       SYSLOG ANALYZER - LIVE MONITOR          ║\n";
+    std::cout << "╚════════════════════════════════════════════════╝\n";
+    std::cout << "Total Errors: " << analyzer.getErrorCount() << "\n";
+    std::cout << "Last Update: " << getCurrentTime() << "\n";
+    std::cout << "\nRecent Alerts:\n";
+    
+    // In các alert gần đây
+    for (const auto& log : analyzer.getRecentAlerts(10)) {
+        display(log);
+    }
+    
+    std::cout << "\n[S]witch | [Q]uit\n";
+}
+```
+
+---
+
+### 4️⃣ Kỹ thuật Xử lý sự cố (Error Handling)
+
+#### **Graceful Exit (Thoát an toàn)**
+
+Bắt tín hiệu `SIGINT` (Ctrl+C) để đóng file và dọn dẹp tài nguyên trước khi tắt, tránh việc hỏng file log hoặc leak bộ nhớ:
+
+```cpp
+// Global variable để signal handler
+volatile bool shouldExit = false;
+
+// Signal handler
+void handleSignal(int signal) {
+    if (signal == SIGINT) {
+        shouldExit = true;
+        std::cout << "\n[INFO] Gracefully shutting down...\n";
+    }
+}
+
+// main.cpp
+int main() {
+    // Đăng ký signal handler
+    std::signal(SIGINT, handleSignal);
+    
+    LogReader reader("data/raw_logs.txt");
+    LogAnalyzer analyzer;
+    
+    while (!shouldExit) {
+        if (reader.hasNewLogs()) {
+            auto logs = reader.readNewLogs();
+            analyzer.process(logs);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    
+    // Dọn dẹp tài nguyên
+    reader.close();
+    analyzer.cleanup();
+    
+    std::cout << "[INFO] Cleanup completed. Goodbye!\n";
+    return 0;
+}
+```
+
+#### **Config-driven Development (Phát triển dựa trên cấu hình)**
+
+Tách các thông số như `threshold`, `path`, `timeout` ra file `config.h` để dễ dàng điều chỉnh cấu hình mà không cần biên dịch lại code:
+
+```cpp
+// app/config/config.h
+#pragma once
+
+// ========== FILE PATHS ==========
+const char* LOG_FILE_PATH = "data/raw_logs.txt";
+const char* OUTPUT_FILE_PATH = "output/alerts.log";
+
+// ========== BUFFER & BATCH SETTINGS ==========
+const size_t MAX_BUFFER_SIZE = 10000;        // Kích thước buffer tối đa
+const size_t BATCH_SIZE = 100;               // Số log/lần đọc
+const size_t BATCH_TIMEOUT_MS = 500;         // Thời gian chờ batch (ms)
+
+// ========== THRESHOLDS & ALERT LEVELS ==========
+const int ERROR_THRESHOLD = 50;              // Cảnh báo khi lỗi > 50/phút
+const int WARNING_THRESHOLD = 20;
+const int CRITICAL_THRESHOLD = 100;
+
+// ========== POLLING SETTINGS ==========
+const int POLLING_INTERVAL_MS = 100;         // Thăm dò mỗi 100ms
+const int SLEEP_ON_IDLE_MS = 1000;          // Sleep 1s khi ko có dữ liệu
+
+// ========== UI/DISPLAY ==========
+const bool ENABLE_COLOR_OUTPUT = true;       // Bật tô màu ANSI
+const int REFRESH_RATE_MS = 500;            // Cập nhật dashboard mỗi 500ms
+
+// ========== DEBUG ==========
+const bool DEBUG_MODE = false;               // In debug info
+const bool LOG_TO_FILE = true;               // Lưu log ra file
+```
+
+**Sử dụng:**
+
+```cpp
+// app/processing/LogAnalyzer.cpp
+#include "../config/config.h"
+
+void LogAnalyzer::checkThreshold(const Log& log) {
+    if (log.level == "ERROR" && errorCount > ERROR_THRESHOLD) {
+        AlertNotifier::alert("Error rate exceeded: " + std::to_string(errorCount));
+    }
+}
+
+// main.cpp
+#include "config/config.h"
+
+int main() {
+    LogReader reader(LOG_FILE_PATH);
+    LogAnalyzer analyzer;
+    
+    // Đảo ngược cấu hình dễ dàng mà không cần recompile
+    while (true) {
+        if (reader.hasNewLogs()) {
+            auto logs = reader.readBatch(BATCH_SIZE);
+            analyzer.process(logs);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(POLLING_INTERVAL_MS));
+    }
+    
+    return 0;
+}
+```
+
+**Lợi ích:**
+- ✅ Điều chỉnh thông số mà không cần recompile (thay đổi `config.h` → `make rebuild`)
+- ✅ Dễ dàng thử nghiệm các tham số khác nhau
+- ✅ Tách biệt cấu hình từ logic code
+
+---
+
+## �📂 Cấu trúc thư mục chi tiết
 
 ```
 syslog-analyzer-core/
