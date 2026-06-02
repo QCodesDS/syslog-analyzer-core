@@ -67,12 +67,12 @@ struct Vector {
     ~Vector() { delete[] this->arr; }
 
     Vector(const Vector& other) {
-        capacity = other.capacity;
-        size = other.size;
-        arr = new T[capacity];
+        this->capacity = other.capacity;
+        this->size = other.size;
+        this->arr = new T[capacity];
 
         for (int i = 0; i < size; i++) {
-            arr[i] = other.arr[i];
+            this->arr[i] = other.arr[i];
         }
     }
 
