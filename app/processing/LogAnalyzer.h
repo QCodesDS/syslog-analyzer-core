@@ -1,0 +1,4 @@
+#ifndef LOGANALYZER_H
+#define LOGANALYZER_H
+
+#endif  // LOGANALYZER_H

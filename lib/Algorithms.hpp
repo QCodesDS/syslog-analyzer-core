@@ -1,0 +1,4 @@
+#ifndef ALGORITHMS_HPP
+#define ALGORITHMS_HPP
+
+#endif  // ALGORITHMS_HPP

@@ -1,0 +1,4 @@
+#ifndef ALERTNOTIFIER_H
+#define ALERTNOTIFIER_H
+
+#endif  // ALERTNOTIFIER_H

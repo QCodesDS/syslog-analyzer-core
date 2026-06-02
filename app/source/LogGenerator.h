@@ -1,0 +1,4 @@
+#ifndef LOGGENERATOR_H
+#define LOGGENERATOR_H
+
+#endif  // LOGGENERATOR_H
