@@ -80,7 +80,7 @@ struct Vector {
         if (this == &other)
             return *this;
 
-        delete[] arr;
+        delete[] this->arr;
 
         this->capacity = other.capacity;
         this->size = other.size;
