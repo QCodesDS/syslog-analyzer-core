@@ -35,6 +35,10 @@ struct LinkedList {
         }
     }
 
+    bool empty() { return this->head == nullptr; }
+
+    bool empty() const { return this->head == nullptr; }
+
     void insertFront(const T& value) {
         LinkedListNode<T>* newNode = new LinkedListNode<T>(value);
         newNode->next = this->head;

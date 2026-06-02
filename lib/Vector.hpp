@@ -25,15 +25,6 @@ struct Vector {
         this->size = 0;
     }
 
-    void clear() {
-        if (this->arr) {
-            delete[] arr;
-            this->arr = nullptr;
-            this->capacity = 0;
-            this->size = 0;
-        }
-    }
-
     void pushBack(const T& value) {
         if ((this->size + 1) > this->capacity) {
             int oldSize = this->size;
@@ -50,6 +41,8 @@ struct Vector {
         this->size++;
     }
 
+    void popBack() { this->size = std::max(this->size - 1, 0); }
+
     T& operator[](int idx) {
         if (idx >= 0 && idx < this->size) {
             return this->arr[idx];
@@ -64,7 +57,7 @@ struct Vector {
         throw std::runtime_error("Index out of bound");
     }
 
-    ~Vector() { delete[] this->arr; }
+    ~Vector() { clear(); }
 
     Vector(const Vector& other) {
         this->capacity = other.capacity;
@@ -80,7 +73,7 @@ struct Vector {
         if (this == &other)
             return *this;
 
-        delete[] this->arr;
+        clear();
 
         this->capacity = other.capacity;
         this->size = other.size;
@@ -91,6 +84,16 @@ struct Vector {
         }
 
         return *this;
+    }
+
+private:
+    void clear() {
+        if (this->arr) {
+            delete[] arr;
+            this->arr = nullptr;
+            this->capacity = 0;
+            this->size = 0;
+        }
     }
 };
 
