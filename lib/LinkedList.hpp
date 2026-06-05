@@ -2,6 +2,7 @@
 #define LINKEDLIST_HPP
 
 #include <stdexcept>
+
 template<typename T>
 struct LinkedListNode {
     T value;

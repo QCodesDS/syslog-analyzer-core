@@ -52,13 +52,14 @@ struct AVL {
         return nullptr;
     }
 
-    void clear(AVLNode<T>* root) {
+    void clear(AVLNode<T>*& root) {
         if (!root) {
             return;
         }
         clear(root->left);
         clear(root->right);
         delete root;
+        root = nullptr;
     }
 
     Vector<T> lnr() const {

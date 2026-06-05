@@ -50,10 +50,15 @@ template<typename T, typename Comp = std::less<T>>
 void bubbleSort(Vector<T>& arr, Comp cmp = Comp()) {
     int n = arr.size;
     for (int i = 0; i < n; i++) {
+        bool swapped = false;
         for (int j = 0; j < n - i - 1; j++) {
             if (cmp(arr[j + 1], arr[j])) {
+                swapped = true;
                 std::swap(arr[j], arr[j + 1]);
             }
+        }
+        if (!swapped) {
+            break;
         }
     }
 }
@@ -80,11 +85,10 @@ int partition(Vector<T>& a, int low, int high, Comp cmp = Comp()) {
         std::swap(a[low], a[mid]);
     if (cmp(a[high], a[low]))
         std::swap(a[low], a[high]);
-    if ((a[high], a[mid]))
+    if (cmp(a[high], a[mid]))
         std::swap(a[mid], a[high]);
 
     std::swap(a[mid], a[low]);
-    int pivotIdx = low;
     int pivot = a[low];
     int leftIdx = low + 1;
     for (int i = low + 1; i <= high; i++) {
@@ -146,7 +150,7 @@ void heapDown(Vector<T>& arr, int i, int n, Comp cmp = Comp()) {
 
 template<typename T, typename Comp = std::less<T>>
 void heapSort(Vector<T>& arr, Comp cmp = Comp()) {
-    int n = arr.size();
+    int n = arr.size;
     for (int i = (n - 1) / 2; i >= 0; i--) {
         heapDown(arr, i, n, cmp);
     }

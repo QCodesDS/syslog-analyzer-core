@@ -6,23 +6,16 @@
 #include "LinkedList.hpp"
 
 template<typename T>
-struct Stack {
+struct Queue {
     LinkedList<T> ll;
-    Stack() {}
+    Queue() {}
 
     void enqueue(const T& value) { this->ll.insertBack(value); }
-    bool empty() { return this->ll.empty(); }
+    bool empty() const { return this->ll.empty(); }
     int size() { return this->ll.size(); }
     bool dequeue() { return this->ll.removeAt(0); }
 
     const T& front() const {
-        if (empty()) {
-            throw std::runtime_error("There is nothing in queue to operate front()");
-        }
-        return this->ll.head->value;
-    }
-
-    T& top() {
         if (empty()) {
             throw std::runtime_error("There is nothing in queue to operate front()");
         }

@@ -19,6 +19,8 @@ struct Pair {
         this->value = value;
     }
 
+    Pair() {}
+
     bool operator<(const Pair& other) const { return key < other.key; }
 
     bool operator>(const Pair& other) const { return key > other.key; }
@@ -32,7 +34,7 @@ struct HashTable {
     Hasher<K>* hasher;
     int count;
     Vector<AVL<Pair<K, V>>> table;
-    HashTable(Hasher<K> hasher) {
+    HashTable(Hasher<K>* hasher) {
         this->table = Vector<AVL<Pair<K, V>>>(TABLE_SIZE, AVL<Pair<K, V>>());
         this->hasher = hasher;
         this->count = 0;
