@@ -1,247 +1,249 @@
 #ifndef AVL_HPP
 #define AVL_HPP
 
+#include <algorithm>
+
 #include "Vector.hpp"
 
 template<typename T>
 struct AVLNode {
     T value;
-    AVLNode<T>* left;
-    AVLNode<T>* right;
+    AVLNode* left;
+    AVLNode* right;
     int height;
-    AVLNode(const T& value) {
-        this->value = value;
-        this->left = nullptr;
-        this->right = nullptr;
-        this->height = 0;
-    }
+
+    AVLNode(const T& val) : value(val), left(nullptr), right(nullptr), height(0) {}
 };
 
 template<typename T>
-struct AVL {
+class AVL {
+private:
     AVLNode<T>* root;
-    AVL() { this->root = nullptr; }
-    AVL(const AVL& other) { this->root = copyTree(other.root); }
-    void insert(const T& value) { this->root = insertValue(value, this->root); }
-    void remove(const T& value) { this->root = removeValue(value, this->root); }
-    bool search(const T& value) const {
-        AVLNode<T>* searchNode = this->root;
-        while (searchNode) {
-            if (searchNode->value == value) {
-                return true;
-            } else if (searchNode->value > value) {
-                searchNode = searchNode->left;
-            } else {
-                searchNode = searchNode->right;
-            }
-        }
-        return false;
-    }
 
-    T* find(const T& value) {
-        AVLNode<T>* searchNode = this->root;
-        while (searchNode) {
-            if (searchNode->value == value) {
-                return &searchNode->value;
-            } else if (searchNode->value > value) {
-                searchNode = searchNode->left;
-            } else {
-                searchNode = searchNode->right;
-            }
-        }
-        return nullptr;
-    }
+public:
+    AVLNode<T>* getRoot() const { return root; }
+    int height() const { return getHeight(root); }
 
-    void clear(AVLNode<T>*& root) {
-        if (!root) {
-            return;
-        }
-        clear(root->left);
-        clear(root->right);
-        delete root;
+    // Initializes an empty AVL Tree
+    AVL() : root(nullptr) {}
+
+    // Delete copy operations to prevent double free
+    AVL(const AVL&) = delete;
+    AVL& operator=(const AVL&) = delete;
+
+    // Destructor to free all heap memory
+    ~AVL() { clearTree(); }
+
+    // Fully clears the tree
+    void clearTree() {
+        clear(root);
         root = nullptr;
     }
 
+    // Inserts a value into the AVL tree, rebalancing as necessary
+    void insert(const T& value) { root = insertNode(root, value); }
+
+    // Removes a value from the AVL tree, rebalancing as necessary
+    void remove(const T& value) { root = removeNode(root, value); }
+
+    // Searches for a value in the AVL tree
+    bool search(const T& value) const { return searchNode(root, value); }
+
+    // Finds and returns a pointer to the stored value, or nullptr if not found
+    T* find(const T& value) { return findNode(root, value); }
+
+    // Returns a vector containing the in-order traversal (LNR) of the AVL tree
     Vector<T> lnr() const {
         Vector<T> result;
-        lnr(this->root, result);
+        inOrder(root, result);
         return result;
     }
+
+    // Returns a vector containing the pre-order traversal (NLR) of the AVL tree
     Vector<T> nlr() const {
         Vector<T> result;
-        nlr(this->root, result);
+        preOrder(root, result);
         return result;
     }
+
+    // Returns a vector containing the post-order traversal (LRN) of the AVL tree
     Vector<T> lrn() const {
         Vector<T> result;
-        lrn(this->root, result);
+        postOrder(root, result);
         return result;
-    }
-
-    ~AVL() {
-        clear(this->root);
-        this->root = nullptr;
-    }
-
-    AVL& operator=(const AVL& other) {
-        if (this == &other) {
-            return *this;
-        }
-        clear(this->root);
-        this->root = copyTree(other.root);
-        return *this;
     }
 
 private:
-    AVLNode<T>* insertValue(const T& val, AVLNode<T>* root) {
-        if (!root) {
-            return new AVLNode<T>(val);
-        }
-        if (val < root->value) {
-            root->left = insertValue(val, root->left);
-        } else if (val > root->value) {
-            root->right = insertValue(val, root->right);
-        } else {
-            root->value = val;
-        }
-        root = rebalance(root);
-        return root;
-    }
-    AVLNode<T>* removeValue(const T& val, AVLNode<T>* root) {
-        if (!root) {
-            return nullptr;
-        }
-        if (val < root->value) {
-            root->left = removeValue(val, root->left);
-        } else if (val > root->value) {
-            root->right = removeValue(val, root->right);
-        } else {
-            // 2 con
-            if (root->left && root->right) {
-                AVLNode<T>* minRight = findLeftMost(root->right);
-                root->value = minRight->value;
-                root->right = removeValue(minRight->value, root->right);
-            } else {
-                AVLNode<T>* child = root->left ? root->left : root->right;
-                delete root;
-                root = child;
-            }
-        }
-        root = rebalance(root);
-        return root;
-    }
+    // Helper to get the height of a node
+    int getHeight(AVLNode<T>* node) const { return node ? node->height : -1; }
 
-    AVLNode<T>* findLeftMost(AVLNode<T>* root) {
-        if (!root) {
-            return nullptr;
-        }
-        while (root->left) {
-            root = root->left;
-        }
-        return root;
-    }
-
-    void lnr(AVLNode<T>* root, Vector<T>& result) const {
-        if (!root) {
-            return;
-        }
-        lnr(root->left, result);
-        result.pushBack(root->value);
-        lnr(root->right, result);
-    }
-
-    void nlr(AVLNode<T>* root, Vector<T>& result) const {
-        if (!root) {
-            return;
-        }
-        result.pushBack(root->value);
-        nlr(root->left, result);
-        nlr(root->right, result);
-    }
-
-    void lrn(AVLNode<T>* root, Vector<T>& result) const {
-        if (!root) {
-            return;
-        }
-        lrn(root->left, result);
-        lrn(root->right, result);
-        result.pushBack(root->value);
-    }
-
-    AVLNode<T>* copyTree(AVLNode<T>* otherRoot) {
-        if (!otherRoot) {
-            return nullptr;
-        }
-        AVLNode<T>* newRoot = new AVLNode<T>(otherRoot->value);
-        newRoot->height = otherRoot->height;
-        newRoot->left = copyTree(otherRoot->left);
-        newRoot->right = copyTree(otherRoot->right);
-        return newRoot;
-    }
-
-    int getHeight(AVLNode<T>* root) {
-        if (!root) {
-            return -1;
-        }
-        return root->height;
-    }
-
-    int getHeightFactor(AVLNode<T>* root) {
-        if (!root) {
+    // Helper to get the balance factor of a node
+    int getBalanceFactor(AVLNode<T>* node) const {
+        if (!node)
             return 0;
-        }
-        return getHeight(root->right) - getHeight(root->left);
+        return getHeight(node->right) - getHeight(node->left);
     }
 
-    void recalculateHeight(AVLNode<T>* root) {
-        if (!root) {
-            return;
+    // Helper to recalculate the height of a node
+    void recalculateHeight(AVLNode<T>* node) {
+        if (node) {
+            node->height = 1 + std::max(getHeight(node->left), getHeight(node->right));
         }
-        root->height = 1 + std::max(getHeight(root->left), getHeight(root->right));
     }
 
-    AVLNode<T>* rotateLeft(AVLNode<T>* root) {
-        if (!root || !root->right) {
-            return root;
-        }
-        AVLNode<T>* right = root->right;
-        root->right = right->left;
-        right->left = root;
-        recalculateHeight(root);
-        recalculateHeight(right);
-        return right;
+    // Performs a right rotation
+    AVLNode<T>* rotateRight(AVLNode<T>* y) {
+        AVLNode<T>* x = y->left;
+        AVLNode<T>* T2 = x->right;
+
+        x->right = y;
+        y->left = T2;
+
+        recalculateHeight(y);
+        recalculateHeight(x);
+
+        return x;
     }
 
-    AVLNode<T>* rotateRight(AVLNode<T>* root) {
-        if (!root || !root->left) {
-            return root;
-        }
-        AVLNode<T>* left = root->left;
-        root->left = left->right;
-        left->right = root;
-        recalculateHeight(root);
-        recalculateHeight(left);
-        return left;
+    // Performs a left rotation
+    AVLNode<T>* rotateLeft(AVLNode<T>* x) {
+        AVLNode<T>* y = x->right;
+        AVLNode<T>* T2 = y->left;
+
+        y->left = x;
+        x->right = T2;
+
+        recalculateHeight(x);
+        recalculateHeight(y);
+
+        return y;
     }
 
-    AVLNode<T>* rebalance(AVLNode<T>* root) {
-        if (!root) {
+    // Rebalances a node if its balance factor is out of bounds
+    AVLNode<T>* rebalance(AVLNode<T>* node) {
+        recalculateHeight(node);
+        int balance = getBalanceFactor(node);
+
+        // Right heavy
+        if (balance > 1) {
+            if (getBalanceFactor(node->right) < 0) {
+                node->right = rotateRight(node->right);
+            }
+            return rotateLeft(node);
+        }
+        // Left heavy
+        if (balance < -1) {
+            if (getBalanceFactor(node->left) > 0) {
+                node->left = rotateLeft(node->left);
+            }
+            return rotateRight(node);
+        }
+        return node;
+    }
+
+    // Helper to insert a node and rebalance
+    AVLNode<T>* insertNode(AVLNode<T>* node, const T& value) {
+        if (!node)
+            return new AVLNode<T>(value);
+        if (value < node->value) {
+            node->left = insertNode(node->left, value);
+        } else if (value > node->value) {
+            node->right = insertNode(node->right, value);
+        } else {
+            return node;  // Duplicates not allowed or simply ignored
+        }
+        return rebalance(node);
+    }
+
+    // Helper to find the minimum value node in a subtree
+    AVLNode<T>* findMin(AVLNode<T>* node) {
+        while (node && node->left) {
+            node = node->left;
+        }
+        return node;
+    }
+
+    // Helper to remove a node and rebalance
+    AVLNode<T>* removeNode(AVLNode<T>* node, const T& value) {
+        if (!node)
             return nullptr;
-        }
-        recalculateHeight(root);
-        int factor = getHeightFactor(root);
-        if (factor > 1) {                            // right
-            if (getHeightFactor(root->right) < 0) {  // left
-                root->right = rotateRight(root->right);
+
+        if (value < node->value) {
+            node->left = removeNode(node->left, value);
+        } else if (value > node->value) {
+            node->right = removeNode(node->right, value);
+        } else {
+            if (!node->left) {
+                AVLNode<T>* rightChild = node->right;
+                delete node;
+                return rightChild;
+            } else if (!node->right) {
+                AVLNode<T>* leftChild = node->left;
+                delete node;
+                return leftChild;
+            } else {
+                AVLNode<T>* minNode = findMin(node->right);
+                node->value = minNode->value;
+                node->right = removeNode(node->right, minNode->value);
             }
-            root = rotateLeft(root);
-        } else if (factor < -1) {                   // left
-            if (getHeightFactor(root->left) > 0) {  // right
-                root->left = rotateLeft(root->left);
-            }
-            root = rotateRight(root);
         }
-        return root;
+        return rebalance(node);
+    }
+
+    // Helper to clear the tree
+    void clear(AVLNode<T>* node) {
+        if (node) {
+            clear(node->left);
+            clear(node->right);
+            delete node;
+        }
+    }
+
+    // Helper to search for a value
+    bool searchNode(AVLNode<T>* node, const T& value) const {
+        if (!node)
+            return false;
+        if (value == node->value)
+            return true;
+        if (value < node->value)
+            return searchNode(node->left, value);
+        return searchNode(node->right, value);
+    }
+
+    // Helper to find a value
+    T* findNode(AVLNode<T>* node, const T& value) {
+        if (!node)
+            return nullptr;
+        if (value == node->value)
+            return &(node->value);
+        if (value < node->value)
+            return findNode(node->left, value);
+        return findNode(node->right, value);
+    }
+
+    // Helpers for traversal
+    void inOrder(AVLNode<T>* node, Vector<T>& vec) const {
+        if (node) {
+            inOrder(node->left, vec);
+            vec.pushBack(node->value);
+            inOrder(node->right, vec);
+        }
+    }
+
+    void preOrder(AVLNode<T>* node, Vector<T>& vec) const {
+        if (node) {
+            vec.pushBack(node->value);
+            preOrder(node->left, vec);
+            preOrder(node->right, vec);
+        }
+    }
+
+    void postOrder(AVLNode<T>* node, Vector<T>& vec) const {
+        if (node) {
+            postOrder(node->left, vec);
+            postOrder(node->right, vec);
+            vec.pushBack(node->value);
+        }
     }
 };
 

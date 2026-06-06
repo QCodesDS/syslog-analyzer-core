@@ -8,184 +8,171 @@ struct LinkedListNode {
     T value;
     LinkedListNode* next;
     LinkedListNode* prev;
-    LinkedListNode(const T& val) {
-        this->value = val;
-        this->next = nullptr;
-        this->prev = nullptr;
-    }
+
+    LinkedListNode(const T& val) : value(val), next(nullptr), prev(nullptr) {}
 };
 
 template<typename T>
-struct LinkedList {
+class LinkedList {
+private:
     LinkedListNode<T>* head;
     LinkedListNode<T>* tail;
+    int listSize;
 
-    LinkedList() {
-        this->head = nullptr;
-        this->tail = nullptr;
-    }
+public:
+    LinkedListNode<T>* getHead() const { return head; }
+    LinkedListNode<T>* getTail() const { return tail; }
 
-    LinkedList(const LinkedList& other) {
-        this->head = nullptr;
-        this->tail = nullptr;
+    // Initializes an empty linked list
+    LinkedList() : head(nullptr), tail(nullptr), listSize(0) {}
 
-        LinkedListNode<T>* otherP = other.head;
-        while (otherP) {
-            insertBack(otherP->value);
-            otherP = otherP->next;
-        }
-    }
-
-    bool empty() { return this->head == nullptr; }
-
-    bool empty() const { return this->head == nullptr; }
-
-    void insertFront(const T& value) {
-        LinkedListNode<T>* newNode = new LinkedListNode<T>(value);
-        newNode->next = this->head;
-        if (!this->head) {
-            this->tail = newNode;
-        } else {
-            this->head->prev = newNode;
-        }
-        this->head = newNode;
-    }
-
-    void insertBack(const T& value) {
-        if (!this->tail) {
-            insertFront(value);
-        } else {
-            LinkedListNode<T>* newNode = new LinkedListNode<T>(value);
-            this->tail->next = newNode;
-            newNode->prev = this->tail;
-            this->tail = newNode;
-        }
-    }
-
-    void insertAt(int index, const T& value) {
-        if (index == 0) {
-            insertFront(value);
-            return;
-        } else if (index < 0) {
-            throw std::runtime_error("Index must not be negative");
-        }
-        LinkedListNode<T>* p = this->head;
-        for (int i = 0; i < index; i++) {
-            if (!p) {  // loi truy cap qua index
-                throw std::runtime_error("Index out of bound in insertion of LinkedList");
-            }
-            p = p->next;
-        }
-        if (p) {
-            LinkedListNode<T>* newNode = new LinkedListNode<T>(value);
-            newNode->prev = p->prev;
-            newNode->next = p;
-            if (p->prev) {
-                p->prev->next = newNode;
-            }
-            p->prev = newNode;
-        } else {  // Truong hop chen vao vi tri sau cung cua linkedlist
-            insertBack(value);
-        }
-    }
-
-    bool remove(const T& value) {
-        LinkedListNode<T>* p = this->head;
-        while (p) {
-            if (p->value == value) {
-                removeNode(p);
-                return true;
-            }
-            p = p->next;
-        }
-        return false;
-    }
-
-    bool removeAt(int index) {
-        if (index < 0) {
-            return false;
-        }
-        LinkedListNode<T>* p = this->head;
-        for (int i = 0; i < index; i++) {
-            if (!p) {  // loi truy cap qua index
-                return false;
-            }
-            p = p->next;
-        }
-        if (p) {
-            removeNode(p);
-            return true;
-        }
-        return false;
-    }
-
-    bool find(const T& value) {
-        LinkedListNode<T>* p = this->head;
-        while (p) {
-            if (p->value == value) {
-                return true;
-            }
-            p = p->next;
-        }
-        return false;
-    }
-
-    int size() {
-        LinkedListNode<T>* p = this->head;
-        int size = 0;
-        while (p) {
-            size++;
-            p = p->next;
-        }
-        return size;
-    }
-
-    void clear() {
-        LinkedListNode<T>* p = this->head;
-        while (p) {
-            LinkedListNode<T>* temp = p;
-            p = p->next;
-            delete temp;
-        }
-        this->head = nullptr;
-        this->tail = nullptr;
-    }
-
+    // Destructor to free all heap memory
     ~LinkedList() { clear(); }
 
-    LinkedList& operator=(const LinkedList& other) {
-        if (this == &other) {
-            return *this;
+    // Copy constructor for deep copy
+    LinkedList(const LinkedList& other) : head(nullptr), tail(nullptr), listSize(0) {
+        LinkedListNode<T>* current = other.head;
+        while (current) {
+            insertBack(current->value);
+            current = current->next;
         }
-        clear();
-        LinkedListNode<T>* otherP = other.head;
-        while (otherP) {
-            insertBack(otherP->value);
-            otherP = otherP->next;
+    }
+
+    // Assignment operator for deep copy
+    LinkedList& operator=(const LinkedList& other) {
+        if (this != &other) {
+            clear();
+            LinkedListNode<T>* current = other.head;
+            while (current) {
+                insertBack(current->value);
+                current = current->next;
+            }
         }
         return *this;
     }
 
-private:
-    void removeNode(LinkedListNode<T>* p) {
-        if (!p) {
-            return;
+    // Inserts a value at the front of the list
+    void insertFront(const T& value) {
+        LinkedListNode<T>* newNode = new LinkedListNode<T>(value);
+        if (!head) {
+            head = tail = newNode;
+        } else {
+            newNode->next = head;
+            head->prev = newNode;
+            head = newNode;
         }
-        if (p == this->head) {
-            this->head = this->head->next;
+        listSize++;
+    }
+
+    // Inserts a value at the back of the list
+    void insertBack(const T& value) {
+        LinkedListNode<T>* newNode = new LinkedListNode<T>(value);
+        if (!tail) {
+            head = tail = newNode;
+        } else {
+            tail->next = newNode;
+            newNode->prev = tail;
+            tail = newNode;
         }
-        if (p == this->tail) {
-            this->tail = this->tail->prev;
+        listSize++;
+    }
+
+    // Inserts a value at a specific index
+    void insertAt(int index, const T& value) {
+        if (index < 0 || index > listSize) {
+            throw std::out_of_range("Index out of bounds");
         }
-        // dieu chinh node prev
-        if (p->prev) {
-            p->prev->next = p->next;
+        if (index == 0) {
+            insertFront(value);
+        } else if (index == listSize) {
+            insertBack(value);
+        } else {
+            LinkedListNode<T>* current = head;
+            for (int i = 0; i < index; i++) {
+                current = current->next;
+            }
+            LinkedListNode<T>* newNode = new LinkedListNode<T>(value);
+            newNode->prev = current->prev;
+            newNode->next = current;
+            current->prev->next = newNode;
+            current->prev = newNode;
+            listSize++;
         }
-        // dieu chinh node next
-        if (p->next) {
-            p->next->prev = p->prev;
+    }
+
+    // Removes the first occurrence of a value from the list
+    bool remove(const T& value) {
+        LinkedListNode<T>* current = head;
+        while (current) {
+            if (current->value == value) {
+                if (current->prev) {
+                    current->prev->next = current->next;
+                } else {
+                    head = current->next;
+                }
+                if (current->next) {
+                    current->next->prev = current->prev;
+                } else {
+                    tail = current->prev;
+                }
+                delete current;
+                listSize--;
+                return true;
+            }
+            current = current->next;
         }
-        delete p;
+        return false;
+    }
+
+    // Removes the element at a specific index
+    void removeAt(int index) {
+        if (index < 0 || index >= listSize) {
+            throw std::out_of_range("Index out of bounds");
+        }
+        LinkedListNode<T>* current = head;
+        for (int i = 0; i < index; i++) {
+            current = current->next;
+        }
+        if (current->prev) {
+            current->prev->next = current->next;
+        } else {
+            head = current->next;
+        }
+        if (current->next) {
+            current->next->prev = current->prev;
+        } else {
+            tail = current->prev;
+        }
+        delete current;
+        listSize--;
+    }
+
+    // Finds if a value exists in the list
+    bool find(const T& value) const {
+        LinkedListNode<T>* current = head;
+        while (current) {
+            if (current->value == value) {
+                return true;
+            }
+            current = current->next;
+        }
+        return false;
+    }
+
+    // Returns the number of elements in the list
+    int size() const { return listSize; }
+
+    // Removes all elements from the list
+    void clear() {
+        LinkedListNode<T>* current = head;
+        while (current) {
+            LinkedListNode<T>* nextNode = current->next;
+            delete current;
+            current = nextNode;
+        }
+        head = tail = nullptr;
+        listSize = 0;
     }
 };
+
 #endif  // LINKEDLIST_HPP

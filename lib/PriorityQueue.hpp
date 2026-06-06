@@ -1,69 +1,107 @@
 #ifndef PRIORITYQUEUE_HPP
 #define PRIORITYQUEUE_HPP
 
-#include <stdexcept>
-
 #include "Vector.hpp"
+#include <stdexcept>
+#include <functional>
 
-template<typename T, typename Comp = std::less<T>>
-struct PriorityQueue {
-    Vector<T> arr;
-    Comp compare;
-    PriorityQueue() {}
+template <typename T, typename Comp = std::less<T>>
+class PriorityQueue {
+private:
+    Vector<T> heap;
+    Comp cmp;
 
-    void insert(const T& value) {
-        this->arr.pushBack(value);
-        heapifyUp(arr.size - 1);
-    }
+public:
 
-    bool empty() const { return this->arr.size == 0; }
+    // Initializes an empty priority queue
+    PriorityQueue() : heap(), cmp() {}
 
-    void extract() {
-        if (this->arr.size == 0) {
-            return;
+    // Destructor
+    ~PriorityQueue() = default;
+
+    // Copy constructor
+    PriorityQueue(const PriorityQueue& other) : heap(other.heap), cmp(other.cmp) {}
+
+    // Assignment operator
+    PriorityQueue& operator=(const PriorityQueue& other) {
+        if (this != &other) {
+            heap = other.heap;
+            cmp = other.cmp;
         }
-
-        std::swap(this->arr[0], this->arr[this->arr.size - 1]);
-        this->arr.popBack();
-        heapifyDown(0);
+        return *this;
     }
 
-    int size() const { return this->arr.size; }
+    // Inserts a value into the priority queue
+    void insert(const T& value) {
+        heap.pushBack(value);
+        heapifyUp(heap.getSize() - 1);
+    }
 
+    // Extracts and removes the top value from the priority queue
+    void extract() {
+        if (empty()) {
+            throw std::out_of_range("Priority Queue is empty");
+        }
+        heap[0] = heap[heap.getSize() - 1];
+        heap.popBack();
+        if (!empty()) {
+            heapifyDown(0);
+        }
+    }
+
+    // Returns a reference to the top value in the priority queue
     T& peek() {
         if (empty()) {
-            throw std::runtime_error("There is no more element in PQ to peek");
+            throw std::out_of_range("Priority Queue is empty");
         }
-        return this->arr[0];
+        return heap[0];
+    }
+
+    // Returns true if the priority queue has no elements
+    bool empty() const {
+        return heap.getSize() == 0;
+    }
+
+    // Returns the number of elements in the priority queue
+    int size() const {
+        return heap.getSize();
     }
 
 private:
-    void heapifyUp(int i) {
-        while (i != 0) {
-            int parent = (i - 1) / 2;
-            if (compare(this->arr[parent], this->arr[i])) {
-                std::swap(this->arr[i], this->arr[parent]);
-                i = parent;
+    // Moves the element at index up to maintain heap property
+    void heapifyUp(int index) {
+        while (index > 0) {
+            int parent = (index - 1) / 2;
+            if (cmp(heap[parent], heap[index])) {
+                T temp = heap[parent];
+                heap[parent] = heap[index];
+                heap[index] = temp;
+                index = parent;
             } else {
                 break;
             }
         }
     }
 
-    void heapifyDown(int i) {
-        while (2 * i + 1 < arr.size) {
-            int left = 2 * i + 1;
-            int right = 2 * i + 2;
+    // Moves the element at index down to maintain heap property
+    void heapifyDown(int index) {
+        int n = heap.getSize();
+        while (true) {
+            int left = 2 * index + 1;
+            int right = 2 * index + 2;
+            int largest = index;
 
-            int best = left;
-
-            if (right < arr.size && compare(arr[best], arr[right])) {
-                best = right;
+            if (left < n && cmp(heap[largest], heap[left])) {
+                largest = left;
             }
-
-            if (compare(arr[i], arr[best])) {
-                std::swap(arr[i], arr[best]);
-                i = best;
+            if (right < n && cmp(heap[largest], heap[right])) {
+                largest = right;
+            }
+            if (largest != index) {
+                T temp = heap[index];
+                heap[index] = heap[largest];
+                heap[largest] = temp;
+                index = largest;
             } else {
                 break;
             }
@@ -71,4 +109,4 @@ private:
     }
 };
 
-#endif  // PRIORITYQUEUE_HPP
+#endif // PRIORITYQUEUE_HPP

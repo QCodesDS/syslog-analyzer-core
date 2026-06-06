@@ -3,12 +3,18 @@
 #include <stdexcept>
 
 template<typename T>
-struct Vector {
+class Vector {
+private:
     int capacity;
     int size;
     T* arr;
-    static const int DEFAULT_CAPACITY = 100;
-    static const int EXPAND_COEFFICIENT = 2;
+
+public:
+    static constexpr int DEFAULT_CAPACITY = 100;
+    static constexpr int EXPAND_COEFFICIENT = 2;
+
+    // Returns the current number of elements
+    int getSize() const { return size; }
 
     Vector(int len, const T& defaultValue) {
         this->capacity = std::max(len, DEFAULT_CAPACITY);
@@ -23,6 +29,34 @@ struct Vector {
         this->arr = new T[DEFAULT_CAPACITY];
         this->capacity = DEFAULT_CAPACITY;
         this->size = 0;
+    }
+
+    // Copy constructor
+    Vector(const Vector& other) {
+        this->capacity = other.capacity;
+        this->size = other.size;
+        this->arr = new T[this->capacity];
+        for (int i = 0; i < this->size; i++) {
+            this->arr[i] = other.arr[i];
+        }
+    }
+
+    // Assignment operator
+    Vector& operator=(const Vector& other) {
+        if (this != &other) {
+            freeMemory();
+            this->capacity = other.capacity;
+            this->size = other.size;
+            if (this->capacity > 0) {
+                this->arr = new T[this->capacity];
+                for (int i = 0; i < this->size; i++) {
+                    this->arr[i] = other.arr[i];
+                }
+            } else {
+                this->arr = nullptr;
+            }
+        }
+        return *this;
     }
 
     void pushBack(const T& value) {
@@ -57,37 +91,13 @@ struct Vector {
         throw std::runtime_error("Index out of bound");
     }
 
-    ~Vector() { clear(); }
+    ~Vector() { freeMemory(); }
 
-    Vector(const Vector& other) {
-        this->capacity = other.capacity;
-        this->size = other.size;
-        this->arr = new T[capacity];
+    // Resets element count to 0 but keeps allocated buffer for reuse (fast reset)
+    void clear() { this->size = 0; }
 
-        for (int i = 0; i < size; i++) {
-            this->arr[i] = other.arr[i];
-        }
-    }
-
-    Vector& operator=(const Vector& other) {
-        if (this == &other)
-            return *this;
-
-        clear();
-
-        this->capacity = other.capacity;
-        this->size = other.size;
-        this->arr = new T[capacity];
-
-        for (int i = 0; i < size; i++) {
-            this->arr[i] = other.arr[i];
-        }
-
-        return *this;
-    }
-
-private:
-    void clear() {
+    // Fully deallocates the internal array — called by destructor only
+    void freeMemory() {
         if (this->arr) {
             delete[] arr;
             this->arr = nullptr;

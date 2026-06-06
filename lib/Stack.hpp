@@ -1,32 +1,62 @@
 #ifndef STACK_HPP
 #define STACK_HPP
-#include <stdexcept>
 
 #include "LinkedList.hpp"
+#include <stdexcept>
 
-template<typename T>
-struct Stack {
-    LinkedList<T> ll;
-    Stack() {}
+template <typename T>
+class Stack {
+private:
+    LinkedList<T> list;
 
-    void push(const T& value) { this->ll.insertFront(value); }
-    bool empty() { return this->ll.empty(); }
-    int size() { return this->ll.size(); }
-    bool pop() { return this->ll.removeAt(0); }
+public:
 
-    const T& top() const {
-        if (empty()) {
-            throw std::runtime_error("There is nothing in stack to operate top()");
+    // Initializes an empty stack
+    Stack() = default;
+
+    // Destructor (automatically calls LinkedList destructor)
+    ~Stack() = default;
+
+    // Copy constructor (automatically uses LinkedList copy constructor)
+    Stack(const Stack& other) : list(other.list) {}
+
+    // Assignment operator (automatically uses LinkedList operator=)
+    Stack& operator=(const Stack& other) {
+        if (this != &other) {
+            list = other.list;
         }
-        return this->ll.head->value;
+        return *this;
     }
 
+    // Pushes a value onto the top of the stack
+    void push(const T& value) {
+        list.insertFront(value);
+    }
+
+    // Pops the top value from the stack
+    bool pop() {
+        if (empty()) return false;
+        list.removeAt(0);
+        return true;
+    }
+
+    // Returns a reference to the top value of the stack
     T& top() {
         if (empty()) {
-            throw std::runtime_error("There is nothing in stack to operate top()");
+            throw std::out_of_range("Stack is empty");
         }
-        return this->ll.head->value;
+        return list.getHead()->value;
+    }
+
+    // Returns true if the stack has no elements
+    bool empty() const {
+        return list.size() == 0;
+    }
+
+    // Returns the number of elements in the stack
+    int size() const {
+        return list.size();
     }
 };
 
-#endif  // STACK_HPP
+#endif // STACK_HPP

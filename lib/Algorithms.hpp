@@ -2,185 +2,195 @@
 #define ALGORITHMS_HPP
 
 #include "Vector.hpp"
+#include <functional>
 
-template<typename T>
-int linearSearch(const Vector<T>& arr, const T& key) {
-    int n = arr.size;
-    for (int i = 0; i < n; i++) {
-        if (arr[i] == key) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-template<typename T>
-int binarySearch(const Vector<T>& arr, const T& key) {
-    int n = arr.size;
-    int l = 0;
-    int r = n - 1;
-    while (l < r) {
-        int m = l + (r - l) / 2;
-        if (arr[m] == key) {
-            return m;
-        } else if (arr[m] < key) {
-            l = m + 1;
-        } else {
-            r = m - 1;
-        }
-    }
-    return -1;
-}
-
-template<typename T, typename Comp = std::less<T>>
-void selectionSort(Vector<T>& arr, Comp cmp = Comp()) {
-    int n = arr.size;
-    for (int i = 0; i < n; i++) {
-        int minIdx = i;
-        for (int j = i + 1; j < n; j++) {
-            if (cmp(arr[j], arr[minIdx])) {  // arr[j] < arr[minIdx]
-                minIdx = j;
-            }
-        }
-        std::swap(arr[i], arr[minIdx]);
-    }
-}
-
-template<typename T, typename Comp = std::less<T>>
-void bubbleSort(Vector<T>& arr, Comp cmp = Comp()) {
-    int n = arr.size;
-    for (int i = 0; i < n; i++) {
+// Sorts elements using the Bubble Sort algorithm
+template <typename T, typename Comp = std::less<T>>
+void bubbleSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
+    int n = arr.getSize();
+    for (int i = 0; i < n - 1; i++) {
         bool swapped = false;
         for (int j = 0; j < n - i - 1; j++) {
             if (cmp(arr[j + 1], arr[j])) {
+                T temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
                 swapped = true;
-                std::swap(arr[j], arr[j + 1]);
             }
         }
-        if (!swapped) {
-            break;
+        if (!swapped) break;
+    }
+}
+
+// Sorts elements using the Selection Sort algorithm
+template <typename T, typename Comp = std::less<T>>
+void selectionSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
+    int n = arr.getSize();
+    for (int i = 0; i < n - 1; i++) {
+        int minIdx = i;
+        for (int j = i + 1; j < n; j++) {
+            if (cmp(arr[j], arr[minIdx])) {
+                minIdx = j;
+            }
+        }
+        if (minIdx != i) {
+            T temp = arr[i];
+            arr[i] = arr[minIdx];
+            arr[minIdx] = temp;
         }
     }
 }
 
-template<typename T, typename Comp = std::less<T>>
-void insertionSort(Vector<T>& arr, Comp cmp = Comp()) {
-    int n = arr.size;
+// Sorts elements using the Insertion Sort algorithm
+template <typename T, typename Comp = std::less<T>>
+void insertionSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
+    int n = arr.getSize();
     for (int i = 1; i < n; i++) {
-        int j = i;
-        T val = arr[i];
-        while (j > 0 && cmp(val, arr[j - 1])) {
-            arr[j] = arr[j - 1];
+        T key = arr[i];
+        int j = i - 1;
+        while (j >= 0 && cmp(key, arr[j])) {
+            arr[j + 1] = arr[j];
             j--;
         }
-        arr[j] = val;
+        arr[j + 1] = key;
     }
 }
 
-template<typename T, typename Comp = std::less<T>>
-int partition(Vector<T>& a, int low, int high, Comp cmp = Comp()) {
-    int mid = low + (high - low) / 2;
+// Helper for heapSort to maintain heap property
+template <typename T, typename Comp>
+void heapify(Vector<T>& arr, int n, int i, Comp cmp) {
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
 
-    if (cmp(a[mid], a[low]))
-        std::swap(a[low], a[mid]);
-    if (cmp(a[high], a[low]))
-        std::swap(a[low], a[high]);
-    if (cmp(a[high], a[mid]))
-        std::swap(a[mid], a[high]);
+    if (left < n && !cmp(arr[left], arr[largest])) {
+        largest = left;
+    }
+    if (right < n && !cmp(arr[right], arr[largest])) {
+        largest = right;
+    }
+    if (largest != i) {
+        T temp = arr[i];
+        arr[i] = arr[largest];
+        arr[largest] = temp;
+        heapify(arr, n, largest, cmp);
+    }
+}
 
-    std::swap(a[mid], a[low]);
-    int pivot = a[low];
-    int leftIdx = low + 1;
-    for (int i = low + 1; i <= high; i++) {
-        if (cmp(a[i], pivot)) {
-            std::swap(a[i], a[leftIdx++]);
+// Sorts elements using the Heap Sort algorithm
+template <typename T, typename Comp = std::less<T>>
+void heapSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
+    int n = arr.getSize();
+    for (int i = n / 2 - 1; i >= 0; i--) {
+        heapify(arr, n, i, cmp);
+    }
+    for (int i = n - 1; i > 0; i--) {
+        T temp = arr[0];
+        arr[0] = arr[i];
+        arr[i] = temp;
+        heapify(arr, i, 0, cmp);
+    }
+}
+
+// Helper for quickSort to partition the array
+template <typename T, typename Comp>
+int partition(Vector<T>& arr, int lo, int hi, Comp cmp) {
+    T pivot = arr[hi];
+    int i = lo - 1;
+    for (int j = lo; j < hi; j++) {
+        if (cmp(arr[j], pivot) || (!cmp(arr[j], pivot) && !cmp(pivot, arr[j]))) {
+            i++;
+            T temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
         }
     }
-    std::swap(a[low], a[leftIdx - 1]);
-    return leftIdx - 1;
+    T temp = arr[i + 1];
+    arr[i + 1] = arr[hi];
+    arr[hi] = temp;
+    return i + 1;
 }
 
-template<typename T, typename Comp = std::less<T>>
-void merge(Vector<T>& arr, int l, int m, int r, Comp cmp = Comp()) {
-    if (l >= r) {
-        return;
+// Sorts elements using the Quick Sort algorithm
+template <typename T, typename Comp = std::less<T>>
+void quickSort(Vector<T>& arr, int lo, int hi, Comp cmp = std::less<T>()) {
+    if (lo < hi) {
+        int pi = partition(arr, lo, hi, cmp);
+        quickSort(arr, lo, pi - 1, cmp);
+        quickSort(arr, pi + 1, hi, cmp);
     }
-    int i = l;
-    int j = m + 1;
-    Vector<T> temp(r - l + 1, T());
-    int currIdx = 0;
-    while (i <= m && j <= r) {
-        if (!cmp(arr[j], arr[i])) {  // harr[i] <= arr[j])
-            temp[currIdx++] = arr[i++];
+}
+
+// Helper for mergeSort to merge two halves
+template <typename T, typename Comp>
+void merge(Vector<T>& arr, int lo, int mid, int hi, Comp cmp) {
+    int n1 = mid - lo + 1;
+    int n2 = hi - mid;
+
+    Vector<T> left(n1, T());
+    Vector<T> right(n2, T());
+
+    for (int i = 0; i < n1; i++) left[i] = arr[lo + i];
+    for (int j = 0; j < n2; j++) right[j] = arr[mid + 1 + j];
+
+    int i = 0, j = 0, k = lo;
+    while (i < n1 && j < n2) {
+        if (cmp(left[i], right[j]) || (!cmp(left[i], right[j]) && !cmp(right[j], left[i]))) {
+            arr[k] = left[i];
+            i++;
         } else {
-            temp[currIdx++] = arr[j++];
+            arr[k] = right[j];
+            j++;
         }
+        k++;
     }
-    while (i <= m) {
-        temp[currIdx++] = arr[i++];
+    while (i < n1) {
+        arr[k] = left[i];
+        i++;
+        k++;
     }
-    while (j <= r) {
-        temp[currIdx++] = arr[j++];
-    }
-    for (int i = l; i <= r; i++) {
-        arr[i] = temp[i - l];
+    while (j < n2) {
+        arr[k] = right[j];
+        j++;
+        k++;
     }
 }
 
-template<typename T, typename Comp = std::less<T>>
-void heapDown(Vector<T>& arr, int i, int n, Comp cmp = Comp()) {
-    while (2 * i + 1 < n) {
-        int left = 2 * i + 1;
-        int right = 2 * i + 2;
-        int maxIdx = left;
-        // 2 children
-        if (right < n) {
-            maxIdx = cmp(arr[left], arr[right]) ? right : left;
+// Sorts elements using the Merge Sort algorithm
+template <typename T, typename Comp = std::less<T>>
+void mergeSort(Vector<T>& arr, int lo, int hi, Comp cmp = std::less<T>()) {
+    if (lo < hi) {
+        int mid = lo + (hi - lo) / 2;
+        mergeSort(arr, lo, mid, cmp);
+        mergeSort(arr, mid + 1, hi, cmp);
+        merge(arr, lo, mid, hi, cmp);
+    }
+}
+
+// Searches for a key using Linear Search, returns index or -1
+template <typename T>
+int linearSearch(const Vector<T>& arr, const T& key) {
+    for (int i = 0; i < arr.getSize(); i++) {
+        if (arr[i] == key) return i;
+    }
+    return -1;
+}
+
+// Searches for a key using Binary Search (assumes sorted), returns index or -1
+template <typename T>
+int binarySearch(const Vector<T>& arr, const T& key) {
+    int lo = 0;
+    int hi = arr.getSize() - 1;
+    while (lo <= hi) {
+        int mid = lo + (hi - lo) / 2;
+        if (arr[mid] == key) return mid;
+        if (arr[mid] < key) {
+            lo = mid + 1;
         } else {
-            maxIdx = left;
-        }
-        if (cmp(arr[i], arr[maxIdx])) {
-            std::swap(arr[maxIdx], arr[i]);
-            i = maxIdx;
-        } else {
-            break;
+            hi = mid - 1;
         }
     }
+    return -1;
 }
 
-template<typename T, typename Comp = std::less<T>>
-void heapSort(Vector<T>& arr, Comp cmp = Comp()) {
-    int n = arr.size;
-    for (int i = (n - 1) / 2; i >= 0; i--) {
-        heapDown(arr, i, n, cmp);
-    }
-
-    for (int i = 0; i < n - 1; i++) {
-        swap(arr[0], arr[n - i - 1]);
-        heapDown(arr, 0, n - i - 1, cmp);
-    }
-}
-
-template<typename T, typename Comp = std::less<T>>
-void mergeSort(Vector<T>& arr, int lo, int hi, Comp cmp = Comp()) {
-    if (lo >= hi) {
-        return;
-    }
-    int m = lo + (hi - lo) / 2;
-    mergeSort(arr, lo, m, cmp);
-    mergeSort(arr, m + 1, hi, cmp);
-    merge(arr, lo, m, hi, cmp);
-}
-
-template<typename T, typename Comp = std::less<T>>
-void quickSort(Vector<T>& arr, int lo, int hi, Comp cmp = Comp()) {
-    if (lo >= hi) {
-        return;
-    }
-
-    int mid = partition(arr, lo, hi, cmp);
-    quickSort(arr, mid + 1, hi, cmp);
-    quickSort(arr, lo, mid - 1, cmp);
-}
-
-#endif  // ALGORITHMS_HPP
+#endif // ALGORITHMS_HPP

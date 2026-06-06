@@ -3,159 +3,165 @@
 
 #include "Vector.hpp"
 
-template<typename T>
+template <typename T>
 struct BSTNode {
     T value;
-    BSTNode<T>* left;
-    BSTNode<T>* right;
-    BSTNode(const T& value) {
-        this->value = value;
-        this->left = nullptr;
-        this->right = nullptr;
-    }
+    BSTNode* left;
+    BSTNode* right;
+    int height; // set to 0 for reuse in AVL
+
+    BSTNode(const T& val) : value(val), left(nullptr), right(nullptr), height(0) {}
 };
 
-template<typename T>
-struct BST {
+template <typename T>
+class BST {
+private:
     BSTNode<T>* root;
-    BST() { this->root = nullptr; }
-    BST(const BST& other) { this->root = copyTree(other.root); }
-    void insert(const T& value) { this->root = insertValue(value, this->root); }
-    void remove(const T& value) { this->root = removeValue(value, this->root); }
-    bool search(const T& value) const {
-        BSTNode<T>* searchNode = this->root;
-        while (searchNode) {
-            if (searchNode->value == value) {
-                return true;
-            } else if (searchNode->value > value) {
-                searchNode = searchNode->left;
-            } else {
-                searchNode = searchNode->right;
-            }
-        }
-        return false;
+
+public:
+    BSTNode<T>* getRoot() const { return root; }
+
+    // Initializes an empty Binary Search Tree
+    BST() : root(nullptr) {}
+
+    // Delete copy operations to prevent double free
+    BST(const BST&) = delete;
+    BST& operator=(const BST&) = delete;
+
+    // Destructor to free all heap memory
+    ~BST() {
+        clearTree();
     }
 
+    // Fully clears the tree
+    void clearTree() {
+        clear(root);
+        root = nullptr;
+    }
+
+    // Inserts a value into the BST
+    void insert(const T& value) {
+        root = insertNode(root, value);
+    }
+
+    // Removes a value from the BST
+    void remove(const T& value) {
+        root = removeNode(root, value);
+    }
+
+    // Searches for a value in the BST
+    bool search(const T& value) const {
+        return searchNode(root, value);
+    }
+
+    // Returns a vector containing the in-order traversal (LNR) of the BST
     Vector<T> lnr() const {
         Vector<T> result;
-        lnr(this->root, result);
+        inOrder(root, result);
         return result;
     }
+
+    // Returns a vector containing the pre-order traversal (NLR) of the BST
     Vector<T> nlr() const {
         Vector<T> result;
-        nlr(this->root, result);
+        preOrder(root, result);
         return result;
     }
+
+    // Returns a vector containing the post-order traversal (LRN) of the BST
     Vector<T> lrn() const {
         Vector<T> result;
-        lrn(this->root, result);
+        postOrder(root, result);
         return result;
-    }
-
-    ~BST() {
-        clear(this->root);
-        this->root = nullptr;
-    }
-
-    BST& operator=(const BST& other) {
-        if (this == &other) {
-            return *this;
-        }
-        clear(this->root);
-        this->root = copyTree(other.root);
-        return *this;
     }
 
 private:
-    BSTNode<T>* insertValue(const T& val, BSTNode<T>* root) {
-        if (!root) {
-            return new BSTNode<T>(val);
+    // Helper to clear the tree
+    void clear(BSTNode<T>* node) {
+        if (node) {
+            clear(node->left);
+            clear(node->right);
+            delete node;
         }
-        if (val < root->value) {
-            root->left = insertValue(val, root->left);
-        } else if (val > root->value) {
-            root->right = insertValue(val, root->right);
-        }
-        return root;
     }
-    BSTNode<T>* removeValue(const T& val, BSTNode<T>* root) {
-        if (!root) {
-            return nullptr;
+
+    // Helper to insert a node
+    BSTNode<T>* insertNode(BSTNode<T>* node, const T& value) {
+        if (!node) return new BSTNode<T>(value);
+        if (value < node->value) {
+            node->left = insertNode(node->left, value);
+        } else if (value > node->value) {
+            node->right = insertNode(node->right, value);
         }
-        if (val < root->value) {
-            root->left = removeValue(val, root->left);
-        } else if (val > root->value) {
-            root->right = removeValue(val, root->right);
+        return node;
+    }
+
+    // Helper to find the minimum value node in a subtree
+    BSTNode<T>* findMin(BSTNode<T>* node) {
+        while (node && node->left) {
+            node = node->left;
+        }
+        return node;
+    }
+
+    // Helper to remove a node
+    BSTNode<T>* removeNode(BSTNode<T>* node, const T& value) {
+        if (!node) return nullptr;
+
+        if (value < node->value) {
+            node->left = removeNode(node->left, value);
+        } else if (value > node->value) {
+            node->right = removeNode(node->right, value);
         } else {
-            // 2 con
-            if (root->left && root->right) {
-                BSTNode<T>* minRight = findLeftMost(root->right);
-                root->value = minRight->value;
-                root->right = removeValue(minRight->value, root->right);
+            if (!node->left) {
+                BSTNode<T>* rightChild = node->right;
+                delete node;
+                return rightChild;
+            } else if (!node->right) {
+                BSTNode<T>* leftChild = node->left;
+                delete node;
+                return leftChild;
             } else {
-                BSTNode<T>* child = root->left ? root->left : root->right;
-                delete root;
-                root = child;
+                BSTNode<T>* minNode = findMin(node->right);
+                node->value = minNode->value;
+                node->right = removeNode(node->right, minNode->value);
             }
         }
-        return root;
+        return node;
     }
 
-    void clear(BSTNode<T>* root) {
-        if (!root) {
-            return;
-        }
-        clear(root->left);
-        clear(root->right);
-        delete root;
+    // Helper to search for a value
+    bool searchNode(BSTNode<T>* node, const T& value) const {
+        if (!node) return false;
+        if (value == node->value) return true;
+        if (value < node->value) return searchNode(node->left, value);
+        return searchNode(node->right, value);
     }
 
-    BSTNode<T>* findLeftMost(BSTNode<T>* root) {
-        if (!root) {
-            return nullptr;
+    // Helpers for traversal
+    void inOrder(BSTNode<T>* node, Vector<T>& vec) const {
+        if (node) {
+            inOrder(node->left, vec);
+            vec.pushBack(node->value);
+            inOrder(node->right, vec);
         }
-        while (root->left) {
-            root = root->left;
-        }
-        return root;
     }
 
-    void lnr(BSTNode<T>* root, Vector<T>& result) const {
-        if (!root) {
-            return;
+    void preOrder(BSTNode<T>* node, Vector<T>& vec) const {
+        if (node) {
+            vec.pushBack(node->value);
+            preOrder(node->left, vec);
+            preOrder(node->right, vec);
         }
-        lnr(root->left, result);
-        result.pushBack(root->value);
-        lnr(root->right, result);
     }
 
-    void nlr(BSTNode<T>* root, Vector<T>& result) const {
-        if (!root) {
-            return;
+    void postOrder(BSTNode<T>* node, Vector<T>& vec) const {
+        if (node) {
+            postOrder(node->left, vec);
+            postOrder(node->right, vec);
+            vec.pushBack(node->value);
         }
-        result.pushBack(root->value);
-        nlr(root->left, result);
-        nlr(root->right, result);
-    }
-
-    void lrn(BSTNode<T>* root, Vector<T>& result) const {
-        if (!root) {
-            return;
-        }
-        lrn(root->left, result);
-        lrn(root->right, result);
-        result.pushBack(root->value);
-    }
-
-    BSTNode<T>* copyTree(BSTNode<T>* otherRoot) {
-        if (!otherRoot) {
-            return nullptr;
-        }
-        BSTNode<T>* newRoot = new BSTNode<T>(otherRoot->value);
-        newRoot->left = copyTree(otherRoot->left);
-        newRoot->right = copyTree(otherRoot->right);
-        return newRoot;
     }
 };
 
-#endif  // BST_HPP
+#endif // BST_HPP

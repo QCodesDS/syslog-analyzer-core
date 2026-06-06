@@ -35,7 +35,7 @@ Trong các hệ thống phân tán quy mô lớn, log được sinh ra liên t�
 - **Cảnh báo thông minh:** Quản lý luồng log sự cố bằng `Priority Queue`, đảm bảo các lỗi `FATAL` / `CRITICAL` luôn được đẩy lên ưu tiên xử lý trước các thông báo `INFO`.
 - **Sắp xếp theo thời gian:** Tối ưu hóa việc hiển thị dòng thời gian sự kiện bằng `BST/AVL` để truy vấn nhanh theo khoảng thời gian.
 - **Simulate Real-time Logging:** Tích hợp tính năng giả lập (inject) log lỗi trực tiếp để kiểm thử luồng cảnh báo.
-<<<<<<< HEAD
+  <<<<<<< HEAD
 - **Incremental Reading & Polling (Đọc tiếp nối & Thăm dò):** Hệ thống không bao giờ bị "đơ" hay nạp toàn bộ file vào RAM. Cơ chế đọc log theo từng batch (ví dụ 100 dòng), ghi nhớ vị trí con trỏ file (`seekg`/`tellg`). Khi hết file (EOF), tự động tạm nghỉ (Sleep) và thăm dò (Polling) log mới.
 - **Stateful Analysis (Phân tích giữ trạng thái):** Giải quyết bài toán lỗi rải rác ở các batch đọc khác nhau bằng cách lưu trạng thái xuyên suốt qua Hash Table, kích hoạt cảnh báo chính xác khi tổng số lỗi đạt ngưỡng (Threshold) trong cửa sổ thời gian (Time window).
 
@@ -49,7 +49,9 @@ Trong các hệ thống phân tán quy mô lớn, log được sinh ra liên t�
 | **Hash Table**            | Đếm tần suất lỗi theo từng dịch vụ                     | Cung cấp khả năng truy xuất và mapping `Service_ID` với độ phức tạp $O(1)$.     |
 | **Priority Queue** (Heap) | Quản lý mức độ nghiêm trọng của log                    | Tự động phân loại và ưu tiên các lỗi nghiêm trọng (`FATAL` > `ERROR` > `WARN`). |
 | **QuickSort**             | Sắp xếp lịch sử log                                    | Đảm bảo các sự kiện được duyệt và hiển thị đúng theo trình tự thời gian.        |
+
 =======
+
 - **⚡ Incremental Reading (Đọc Gia Tăng):** Xử lý file log khổng lồ mà không cần tải toàn bộ vào RAM (sử dụng con trỏ file và buffer).
 
 ## 🔑 Kỹ thuật Incremental Reading (Đọc Gia Tăng)
@@ -80,12 +82,12 @@ while (reader.hasNext()) {                    // ✅ Đọc từng dòng
 
 ### 📊 Lợi ích
 
-| Tiêu chí              | Tải toàn bộ | Incremental   |
-| :-------------------- | :---------- | :------------ |
-| **RAM Usage**          | 1GB         | ~10-50MB      |
-| **Latency (Delay)**    | 30s         | < 1s          |
-| **Throughput**         | Sau 30s     | Liên tục      |
-| **Khả năng Real-time** | ❌ Không    | ✅ Có         |
+| Tiêu chí               | Tải toàn bộ | Incremental |
+| :--------------------- | :---------- | :---------- |
+| **RAM Usage**          | 1GB         | ~10-50MB    |
+| **Latency (Delay)**    | 30s         | < 1s        |
+| **Throughput**         | Sau 30s     | Liên tục    |
+| **Khả năng Real-time** | ❌ Không    | ✅ Có       |
 
 ### 🏗️ Cách triển khai trong dự án
 
@@ -96,7 +98,7 @@ private:
     std::ifstream file;
     std::string buffer;           // Chunk nhỏ (~4KB)
     size_t bufferPos = 0;
-    
+
 public:
     bool hasNext();
     Log readNextLine();           // Đọc 1 dòng
@@ -109,11 +111,11 @@ LinkedList<Log> buffer;           // Buffer nhỏ (~100 logs)
 
 while (reader.hasNext()) {
     Log log = reader.readNextLine();
-    
+
     // Xử lý ngay (không chờ)
     analyzer.add(log);
     monitor.check(log);
-    
+
     // Nếu buffer đầy, xóa đi 10%
     if (buffer.size() > MAX_SIZE) {
         buffer.removeOldest(10);
@@ -123,17 +125,18 @@ while (reader.hasNext()) {
 
 ## 🧠 Kiến thức DSA Áp Dụng
 
-| Cấu trúc / Thuật toán        | Mục đích áp dụng trong dự án                                    | Lý do lựa chọn                                                                          | Độ phức tạp |
-| :--------------------------- | :-------------------------------------------------------------- | :-------------------------------------------------------------------------------------- | :---------- |
-| **LinkedList**               | Quản lý Buffer log (chuỗi dữ liệu trong bộ nhớ)                 | Hỗ trợ thêm/xóa phần tử linh hoạt, quản lý vòng đời dữ liệu trong pipeline.             | O(n)        |
-| **Hash Table**               | Đếm tần suất lỗi theo từng dịch vụ (`Service_ID`)               | Cung cấp khả năng truy xuất và mapping với độ phức tạp $O(1)$, tối ưu RAM.              | O(1)        |
+| Cấu trúc / Thuật toán        | Mục đích áp dụng trong dự án                                   | Lý do lựa chọn                                                                          | Độ phức tạp |
+| :--------------------------- | :------------------------------------------------------------- | :-------------------------------------------------------------------------------------- | :---------- |
+| **LinkedList**               | Quản lý Buffer log (chuỗi dữ liệu trong bộ nhớ)                | Hỗ trợ thêm/xóa phần tử linh hoạt, quản lý vòng đời dữ liệu trong pipeline.             | O(n)        |
+| **Hash Table**               | Đếm tần suất lỗi theo từng dịch vụ (`Service_ID`)              | Cung cấp khả năng truy xuất và mapping với độ phức tạp $O(1)$, tối ưu RAM.              | O(1)        |
 | **Binary Search Tree (BST)** | Lưu trữ log theo thời gian (Range Query: tìm log trong khoảng) | Hỗ trợ tìm kiếm theo phạm vi thời gian hiệu quả, giúp phân tích xu hướng lỗi theo ngày. | O(log n)    |
-| **AVL Tree**                 | Giữ cây nhị phân tự cân bằng (phiên bản tối ưu)                 | Đảm bảo tốc độ tìm kiếm luôn $O(\log n)$ ngay cả trong trường hợp xấu nhất.              | O(log n)    |
-| **Priority Queue** (Heap)    | Quản lý hàng đợi cảnh báo theo mức độ nghiêm trọng              | Tự động ưu tiên lỗi `FATAL` > `CRITICAL` > `ERROR` > `WARN`, xử lý đúng thứ tự.         | O(log n)    |
-| **Trie**                     | Tìm kiếm từ khóa lỗi (`ERROR`, `FATAL`, `TIMEOUT`,...)          | Tối ưu hóa tốc độ tìm kiếm tiền tố (prefix search) trên tập từ khóa lớn.                | O(m)        |
+| **AVL Tree**                 | Giữ cây nhị phân tự cân bằng (phiên bản tối ưu)                | Đảm bảo tốc độ tìm kiếm luôn $O(\log n)$ ngay cả trong trường hợp xấu nhất.             | O(log n)    |
+| **Priority Queue** (Heap)    | Quản lý hàng đợi cảnh báo theo mức độ nghiêm trọng             | Tự động ưu tiên lỗi `FATAL` > `CRITICAL` > `ERROR` > `WARN`, xử lý đúng thứ tự.         | O(log n)    |
+| **Trie**                     | Tìm kiếm từ khóa lỗi (`ERROR`, `FATAL`, `TIMEOUT`,...)         | Tối ưu hóa tốc độ tìm kiếm tiền tố (prefix search) trên tập từ khóa lớn.                | O(m)        |
 
 **Ghi chú:** $m$ = độ dài string tìm kiếm, $n$ = số phần tử trong tập dữ liệu.
->>>>>>> acd492f102e5682f5d02aea3c76df587115aafe5
+
+> > > > > > > acd492f102e5682f5d02aea3c76df587115aafe5
 
 ## ⚙️ Kiến trúc hệ thống
 
@@ -231,7 +234,7 @@ graph TD
     A --> M
     PQ --> N
     M --> D
-    
+
     style Source fill:#e1f5ff
     style Processing fill:#fff3e0
     style Analysis fill:#f3e5f5
@@ -285,7 +288,7 @@ class LogReader {
 private:
     std::ifstream file;
     std::streampos lastPos = 0;  // Lưu vị trí đọc
-    
+
 public:
     std::vector<Log> readNewLogs() {
         file.seekg(lastPos);     // Quay về vị trí cuối
@@ -298,6 +301,7 @@ public:
 ```
 
 **Lợi ích:**
+
 - ✅ Xử lý file log "vô tận" mà không lo tràn RAM
 - ✅ Độ trễ thấp (< 1s) thay vì 30s để tải toàn bộ
 - ✅ Khả năng real-time monitoring
@@ -314,13 +318,14 @@ while (true) {
         std::vector<Log> logs = reader.readNewLogs();
         analyzer.process(logs);
     }
-    
+
     // Tránh "nóng CPU" bằng sleep
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 ```
 
 **Tính chất:**
+
 - Hệ thống luôn "sẵn sàng" đón nhận dữ liệu mới
 - Sleep tránh lãng phí CPU (không polling quá tần số)
 
@@ -333,18 +338,19 @@ const size_t BATCH_SIZE = 100;  // Đọc 100 dòng/lần
 
 while (reader.hasNext()) {
     std::vector<Log> batch = reader.readBatch(BATCH_SIZE);
-    
+
     // Xử lý batch ngay (ko chờ)
     for (const auto& log : batch) {
         analyzer.add(log);
         monitor.check(log);
     }
-    
+
     // Cân bằng: không quá tải (100 dòng) nhưng cũng không bị tồn đọng
 }
 ```
 
 **Ưu điểm:**
+
 - ⚖️ Cân bằng giữa hiệu năng (batch processing) và độ trễ (không bị tồn lâu)
 - 🎯 Cho phép xử lý song song trên từng batch (future enhancement)
 
@@ -357,28 +363,30 @@ while (reader.hasNext()) {
 Kết hợp nhiều cấu trúc dữ liệu để giải quyết từng bài toán cụ thể:
 
 - **Trie**: Quét từ khóa lỗi (Prefix Matching) với độ phức tạp $O(L)$, nhanh hơn bất kỳ thuật toán duyệt chuỗi nào.
+
   ```cpp
   // Ví dụ: Tìm từ khóa "ERROR" hoặc "TIMEOUT"
   Trie<char> errorKeywords;
   errorKeywords.insert("ERROR");
   errorKeywords.insert("TIMEOUT");
   errorKeywords.insert("FATAL");
-  
+
   // Tìm kiếm O(L) với L = độ dài string
   if (errorKeywords.search("ERROR")) { /* Cảnh báo */ }
   ```
 
 - **HashTable**: Thống kê số lỗi theo `serviceID` với truy xuất $O(1)$.
+
   ```cpp
   // Đếm lỗi từng service
   HashTable<std::string, int> serviceErrors;
-  
+
   for (const auto& log : logs) {
       if (log.level == "ERROR") {
           serviceErrors[log.serviceID]++;  // O(1)
       }
   }
-  
+
   // Tìm service nào bị lỗi nhiều nhất
   int maxErrors = 0;
   for (const auto& [service, count] : serviceErrors) {
@@ -387,14 +395,15 @@ Kết hợp nhiều cấu trúc dữ liệu để giải quyết từng bài to�
   ```
 
 - **PriorityQueue**: Quản lý hàng đợi cảnh báo, đảm bảo lỗi `FATAL` luôn được xử lý sớm nhất.
+
   ```cpp
   // Priority: FATAL(3) > CRITICAL(2) > ERROR(1)
   PriorityQueue<Log> alertQueue;
-  
+
   for (const auto& log : logs) {
       alertQueue.push(log, getPriority(log.level));
   }
-  
+
   // Pop theo ưu tiên
   while (!alertQueue.empty()) {
       Log alert = alertQueue.pop();  // Lấy cái có priority cao nhất
@@ -403,10 +412,11 @@ Kết hợp nhiều cấu trúc dữ liệu để giải quyết từng bài to�
   ```
 
 - **AVL Tree** (kế thừa từ BST): Lưu trữ log theo dải thời gian (`range search`), cho phép tìm lại các lỗi trong khoảng thời gian cụ thể cực nhanh.
+
   ```cpp
   // Tìm log trong khoảng thời gian [start_time, end_time]
   AVLTree<time_t, Log> timeIndex;
-  
+
   std::vector<Log> recentErrors = timeIndex.rangeQuery(start_time, end_time);
   // Độ phức tạp: O(log n + k) với k = số kết quả
   ```
@@ -432,7 +442,7 @@ for (const auto& [service, times] : authFailures) {
     for (time_t t : times) {
         if (now - t < 60) recentCount++;
     }
-    
+
     if (recentCount >= 10) {
         notifier.alert("Possible Brute Force Attack on " + service);
     }
@@ -457,7 +467,7 @@ enum class UIMode {
 class LogMonitor {
 private:
     UIMode currentMode = UIMode::LIVE;
-    
+
 public:
     void switchMode() {
         if (currentMode == UIMode::LIVE) {
@@ -467,7 +477,7 @@ public:
         }
         refreshDisplay();
     }
-    
+
     void display() {
         if (currentMode == UIMode::LIVE) {
             displayLiveMode();
@@ -490,7 +500,7 @@ while (true) {
         std::vector<Log> logs = reader.readNewLogs();
         analyzer.process(logs);
     }
-    
+
     // Kiểm tra phím bấm (non-blocking)
     if (_kbhit()) {
         int key = _getch();
@@ -500,7 +510,7 @@ while (true) {
             break;  // [Q] = Quit
         }
     }
-    
+
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 ```
@@ -518,7 +528,7 @@ const char* COLOR_RESET = "\033[0m";       // Reset
 
 void AlertNotifier::display(const Log& log) {
     std::string color;
-    
+
     if (log.level == "FATAL") {
         color = COLOR_RED;
     } else if (log.level == "WARNING") {
@@ -526,9 +536,9 @@ void AlertNotifier::display(const Log& log) {
     } else {
         color = COLOR_GREEN;
     }
-    
-    std::cout << color << "[" << log.timestamp << "] " 
-              << log.level << ": " << log.message 
+
+    std::cout << color << "[" << log.timestamp << "] "
+              << log.level << ": " << log.message
               << COLOR_RESET << std::endl;
 }
 ```
@@ -541,19 +551,19 @@ Sử dụng `system("clear/cls")` kết hợp in lại toàn bộ khung bảng �
 void LogMonitor::displayLiveMode() {
     system("clear");  // Linux/macOS
     // system("cls");  // Windows
-    
+
     std::cout << "╔════════════════════════════════════════════════╗\n";
     std::cout << "║       SYSLOG ANALYZER - LIVE MONITOR          ║\n";
     std::cout << "╚════════════════════════════════════════════════╝\n";
     std::cout << "Total Errors: " << analyzer.getErrorCount() << "\n";
     std::cout << "Last Update: " << getCurrentTime() << "\n";
     std::cout << "\nRecent Alerts:\n";
-    
+
     // In các alert gần đây
     for (const auto& log : analyzer.getRecentAlerts(10)) {
         display(log);
     }
-    
+
     std::cout << "\n[S]witch | [Q]uit\n";
 }
 ```
@@ -582,10 +592,10 @@ void handleSignal(int signal) {
 int main() {
     // Đăng ký signal handler
     std::signal(SIGINT, handleSignal);
-    
+
     LogReader reader("data/raw_logs.txt");
     LogAnalyzer analyzer;
-    
+
     while (!shouldExit) {
         if (reader.hasNewLogs()) {
             auto logs = reader.readNewLogs();
@@ -593,11 +603,11 @@ int main() {
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-    
+
     // Dọn dẹp tài nguyên
     reader.close();
     analyzer.cleanup();
-    
+
     std::cout << "[INFO] Cleanup completed. Goodbye!\n";
     return 0;
 }
@@ -656,7 +666,7 @@ void LogAnalyzer::checkThreshold(const Log& log) {
 int main() {
     LogReader reader(LOG_FILE_PATH);
     LogAnalyzer analyzer;
-    
+
     // Đảo ngược cấu hình dễ dàng mà không cần recompile
     while (true) {
         if (reader.hasNewLogs()) {
@@ -665,12 +675,13 @@ int main() {
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(POLLING_INTERVAL_MS));
     }
-    
+
     return 0;
 }
 ```
 
 **Lợi ích:**
+
 - ✅ Điều chỉnh thông số mà không cần recompile (thay đổi `config.h` → `make rebuild`)
 - ✅ Dễ dàng thử nghiệm các tham số khác nhau
 - ✅ Tách biệt cấu hình từ logic code
@@ -785,6 +796,7 @@ make clean
 # Build lại hoàn toàn
 make rebuild
 ```
+
 ### 📍 Tuần 1: Nền tảng & Cấu trúc dữ liệu
 
 - **Tuần 1.1 - Ngày 1-3 (Thành viên A & B)**
@@ -825,14 +837,15 @@ make rebuild
 ```
 
 <<<<<<< HEAD
+
 ### 4. Cơ chế Vận hành Thời gian thực (Real-time Event Loop)
 
 Chương trình vận hành theo cơ chế Vòng lặp sự kiện thời gian thực (Event Loop). Khi khởi chạy, log sẽ liên tục được 'stream' (chảy) trên màn hình và cập nhật số liệu Dashboard trực tiếp. Người dùng không bị chặn bởi lệnh `cin` mà có thể nhấn các phím tắt (Hotkeys) bất cứ lúc nào để chuyển đổi trạng thái giao diện:
 
 - **Phím `1`**: Chuyển sang chế độ **Live Monitor** (Xem log chạy thời gian thực, lỗi tự động đổi màu ANSI nổi bật).
 - **Phím `2`**: Chuyển sang chế độ **Statistics View** (Xem bảng thống kê tổng quan mà không làm dừng luồng đọc log ngầm).
-- **Phím `Q`**: **Graceful Exit** - Thoát chương trình an toàn (tự động đóng file, giải phóng bộ nhớ, dọn dẹp buffer).
-=======
+- # **Phím `Q`**: **Graceful Exit** - Thoát chương trình an toàn (tự động đóng file, giải phóng bộ nhớ, dọn dẹp buffer).
+
 ### 2️⃣ Memory Management
 
 Dự án tuân theo **RAII Pattern** để tránh memory leak:
@@ -845,7 +858,7 @@ private:
 public:
     LinkedList() : head(nullptr) {}
     ~LinkedList() { deleteAll(); }  // Destructor tự động xóa
-    
+
     void deleteAll() {
         while (head) {
             Node* temp = head;
@@ -907,10 +920,10 @@ class LinkedList { ... };
 
 ### 👥 Nhóm thực hiện
 
-| Vai trò                      | Tên           | MSSV       | Liên lạc                 |
-| :--------------------------- | :------------ | :--------- | :----------------------- |
-| **Data Engineer / Lead A**   | [Tên A]       | [MSSV A]   | [Email/SĐT A]           |
-| **DevOps/SRE Integration B** | [Tên B]       | [MSSV B]   | [Email/SĐT B]           |
+| Vai trò                      | Tên     | MSSV     | Liên lạc      |
+| :--------------------------- | :------ | :------- | :------------ |
+| **Data Engineer / Lead A**   | [Tên A] | [MSSV A] | [Email/SĐT A] |
+| **DevOps/SRE Integration B** | [Tên B] | [MSSV B] | [Email/SĐT B] |
 
 ---
 
@@ -941,6 +954,7 @@ copies or substantial portions of the Software.
 **Distributed System Log Aggregator & Analyzer** không chỉ là một đồ án học tập thông thường. Nó mô phỏng **quy trình thực tế** của các kỹ sư SRE/DevOps trong các công ty công nghệ lớn.
 
 Qua dự án này, chúng tôi:
+
 - ✅ Nắm vững **nguyên lý hoạt động** của các CTDL phổ biến
 - ✅ Hiểu **tradeoff** giữa thời gian & không gian (Time-Space Complexity)
 - ✅ Học cách **thiết kế kiến trúc phần mềm** theo từng lớp (Layered Architecture)
@@ -972,17 +986,18 @@ Qua dự án này, chúng tôi:
 
 **Trách nhiệm chính:** Xây dựng core library (CTDL) và logic phân tích dữ liệu
 
-| File/Module                    | Chi tiết                                                    |
-| :----------------------------- | :---------------------------------------------------------- |
-| `lib/LinkedList.hpp`           | Quản lý buffer log (FIFO)                                   |
-| `lib/HashTable.hpp`            | Mapping Service → Error Count                               |
-| `lib/BST.hpp` + `lib/AVL.hpp`  | Range search theo thời gian (khoảng từ - đến)              |
-| `lib/PriorityQueue.hpp`        | Sắp xếp cảnh báo theo mức độ nghiêm trọng                  |
-| `lib/Trie.hpp`                 | Prefix search cho từ khóa lỗi                              |
-| `app/core/LogParser.cpp`       | Parse string → Log object                                  |
-| `app/processing/LogAnalyzer.cpp` | "Não bộ" của hệ thống, sử dụng tất cả CTDL từ lib/          |
+| File/Module                      | Chi tiết                                           |
+| :------------------------------- | :------------------------------------------------- |
+| `lib/LinkedList.hpp`             | Quản lý buffer log (FIFO)                          |
+| `lib/HashTable.hpp`              | Mapping Service → Error Count                      |
+| `lib/BST.hpp` + `lib/AVL.hpp`    | Range search theo thời gian (khoảng từ - đến)      |
+| `lib/PriorityQueue.hpp`          | Sắp xếp cảnh báo theo mức độ nghiêm trọng          |
+| `lib/Trie.hpp`                   | Prefix search cho từ khóa lỗi                      |
+| `app/core/LogParser.cpp`         | Parse string → Log object                          |
+| `app/processing/LogAnalyzer.cpp` | "Não bộ" của hệ thống, sử dụng tất cả CTDL từ lib/ |
 
 **Công việc tiêu biểu:**
+
 - Đảm bảo **không sử dụng** `std::map`, `std::unordered_map`, `std::priority_queue` nếu bài tập bắt buộc cài đặt thủ công
 - Viết unit test cho từng CTDL
 - Tối ưu hóa độ phức tạp thời gian & không gian
@@ -993,17 +1008,18 @@ Qua dự án này, chúng tôi:
 
 **Trách nhiệm chính:** Kết nối các module, tạo UI/UX, xử lý vòng đời
 
-| File/Module                     | Chi tiết                                                      |
-| :------------------------------ | :------------------------------------------------------------ |
-| `app/source/LogReader.cpp`      | Implement Incremental Reading (con trỏ file, buffer)         |
-| `app/source/LogGenerator.cpp`   | Sinh fake logs để test                                        |
-| `app/processing/LogMonitor.cpp` | Quyết định "khi nào báo động", State Machine logic           |
-| `app/output/AlertNotifier.cpp`  | In cảnh báo, format output, dashboard UI                    |
-| `app/main.cpp`                  | Orchestrator - điều phối toàn bộ flow, vòng lặp chính      |
-| `Makefile`                      | Build script, compile flags, linking                         |
-| `data/raw_logs.txt`             | Chuẩn bị test data                                           |
+| File/Module                     | Chi tiết                                              |
+| :------------------------------ | :---------------------------------------------------- |
+| `app/source/LogReader.cpp`      | Implement Incremental Reading (con trỏ file, buffer)  |
+| `app/source/LogGenerator.cpp`   | Sinh fake logs để test                                |
+| `app/processing/LogMonitor.cpp` | Quyết định "khi nào báo động", State Machine logic    |
+| `app/output/AlertNotifier.cpp`  | In cảnh báo, format output, dashboard UI              |
+| `app/main.cpp`                  | Orchestrator - điều phối toàn bộ flow, vòng lặp chính |
+| `Makefile`                      | Build script, compile flags, linking                  |
+| `data/raw_logs.txt`             | Chuẩn bị test data                                    |
 
 **Công việc tiêu biểu:**
+
 - Thiết kế **Incremental Reading** để tối ưu RAM
 - Implementment **State Machine** (LIVE mode vs STATISTICS mode)
 - Tạo giao diện CLI thân thiện (menu, output formatting)
@@ -1015,6 +1031,7 @@ Qua dự án này, chúng tôi:
 
 1. **Daily Standup:** Mỗi ngày gặp ~10 phút để sync tiến độ
 2. **File `app/main.cpp`** là "nhạc trưởng":
+
    ```cpp
    int main() {
        // 1. Initialization
@@ -1022,7 +1039,7 @@ Qua dự án này, chúng tôi:
        LogAnalyzer analyzer;
        LogMonitor monitor;
        AlertNotifier notifier;
-       
+
        // 2. Main Loop
        while (/* not exit */) {
            if (/* LIVE mode */) {
@@ -1049,33 +1066,47 @@ Qua dự án này, chúng tôi:
 
 ```markdown
 ## 📖 Giới thiệu tổng quan
+
 ![System Overview Diagram](assets/images/overview.png)
+
 <!-- Mô tả tổng quan hệ thống, các thành phần chính -->
 
 ## ⚙️ Kiến trúc hệ thống
+
 ![Data Flow Pipeline](assets/images/pipeline.png)
+
 <!-- Hiển thị luồng dữ liệu từ Source → Parser → Analyzer → Monitor → Notifier -->
 
 ## 🔑 Kỹ thuật Incremental Reading
+
 ![Incremental Reading vs Full Load](assets/images/incremental_reading.png)
+
 <!-- So sánh RAM usage, latency, throughput -->
 
 ## 📂 Cấu trúc thư mục
+
 <!-- (Sơ đồ ASCII đã có, không cần ảnh) -->
 
 ## 🛠 Hướng dẫn cài đặt
+
 ![Build Process](assets/images/build_process.png)
+
 <!-- Flowchart: Clone → Compile → Run → Menu -->
 
 ## ⚙️ Kiến trúc hệ thống (Section với Mermaid)
+
 <!-- Mermaid diagrams đã có, có thể thêm screenshot của chúng -->
 
 ## 📊 Kịch bản Demo
+
 ![Dashboard Screenshot](assets/images/dashboard_demo.png)
+
 <!-- Ảnh thực tế hoặc mock-up của dashboard khi chạy chương trình -->
 
 ## 👥 Phân chia công việc
+
 ![Team Structure](assets/images/team_structure.png)
+
 <!-- Biểu đồ phân công nhiệm vụ giữa 2 thành viên -->
 ```
 
@@ -1099,9 +1130,11 @@ assets/
 
 ```markdown
 ![Alternative Text](path/to/image.png)
+
 <!-- Dạng cơ bản -->
 
 [![Click để xem lớn](path/to/thumbnail.png)](path/to/large.png)
+
 <!-- Dạng click-to-enlarge -->
 
 <img src="path/to/image.png" alt="Description" width="600" height="400" />
@@ -1124,7 +1157,8 @@ assets/
   - ELK Stack (Elasticsearch, Logstash, Kibana)
   - Splunk
   - Datadog
-```
+
+````
 
 ### 3️⃣ Chạy ứng dụng
 
@@ -1134,7 +1168,7 @@ assets/
 
 # Hoặc qua Makefile
 make run
-```
+````
 
 ### 4️⃣ Menu Chức năng & Demo Tương tác
 
@@ -1183,17 +1217,17 @@ $ # └────────────────────────�
 
 ```bash
 $ # Chọn [3] → Dashboard
-$ 
+$
 $ # ═══════════════════════════════════════════
 $ # 📊 DASHBOARD: Top 10 Services by Error
 $ # ═══════════════════════════════════════════
-$ # 
-$ #  1. [auth-service]      825 errors  ████████████░░ 
+$ #
+$ #  1. [auth-service]      825 errors  ████████████░░
 $ #  2. [db-service]        612 errors  █████████░░░░░
 $ #  3. [payment-service]   438 errors  ██████░░░░░░░░
 $ #  4. [api-gateway]       321 errors  █████░░░░░░░░░
 $ #  5. [cache-service]     156 errors  ██░░░░░░░░░░░░
-$ 
+$
 $ # Top Errors:
 $ #  - Connection Timeout: 456 occurrences
 $ #  - Memory Leak Detected: 234 occurrences
@@ -1205,28 +1239,28 @@ $ #  - Database Query Failed: 187 occurrences
 ```bash
 $ # Chọn [4] → Simulate
 $ # Số lượng fake logs: 100
-$ # 
+$ #
 $ # 🔴 [FATAL] Payment Service: Out of Memory
 $ # 🔴 [CRITICAL] Auth Service: Connection refused
 $ # 🟠 [ERROR] DB Service: Query timeout
 $ # 🟡 [WARN] API Gateway: Response time > 5s
-$ 
+$
 $ # [✓] Injected 100 logs, processed 100 in 0.045s
 ```
 
-#### **Kịch bản 4: Live Monitor Mode** 
+#### **Kịch bản 4: Live Monitor Mode**
 
 ```bash
 $ # Chọn [5] → Live Monitor
 $ # [Live Mode Active] Press Ctrl+S to switch to Statistics
-$ 
+$
 $ # ─────────────────────────────────────────────
 $ # 🟢 [2024-06-02 14:32:15] auth-service
 $ #    CRITICAL: Connection timeout (retry 3/3)
-$ # 
+$ #
 $ # 🟢 [2024-06-02 14:32:17] db-service
 $ #    ERROR: Slow query detected (2.3s)
-$ # 
+$ #
 $ # 🟡 [2024-06-02 14:32:19] cache-service
 $ #    WARN: Memory usage at 85%
 ```
@@ -1242,7 +1276,8 @@ make test
 ./test_bst
 ./test_priority_queue
 ```
->>>>>>> acd492f102e5682f5d02aea3c76df587115aafe5
+
+> > > > > > > acd492f102e5682f5d02aea3c76df587115aafe5
 
 ## 📅 Roadmap Phát triển (2 Tuần)
 

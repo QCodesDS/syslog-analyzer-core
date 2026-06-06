@@ -1,10 +1,21 @@
 /**
  * @file Log.h
- * @brief Định nghĩa cấu trúc dữ liệu Log (Log Object).
- * Đại diện cho một dòng log đã được parse, chứa timestamp, serviceID, log level, message.
+ * @brief Defines the Log struct representing a single parsed log entry.
  */
 
 #ifndef LOG_H
 #define LOG_H
+
+#include <string>
+
+struct Log {
+    std::string timestamp;
+    std::string serviceID;
+    std::string severity;
+    std::string message;
+
+    // Returns a formatted string for display
+    std::string toString() const { return "[" + timestamp + "] " + serviceID + " [" + severity + "] " + message; }
+};
 
 #endif  // LOG_H
