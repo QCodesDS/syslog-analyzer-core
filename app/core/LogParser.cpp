@@ -5,6 +5,8 @@
 
 #include "LogParser.h"
 
+#include <regex>
+
 bool LogParser::parse(const std::string& line, Log& out) {
     // Chiều dài dòng tối thiểu hợp lệ: [x] [x] [x] x (7 ký tự)
     if (line.size() < 7 || line[0] != '[') {
@@ -45,6 +47,26 @@ bool LogParser::parse(const std::string& line, Log& out) {
         pos++;
     }
     out.message = line.substr(pos);
+
+    // --- Trích xuất IP và Username bằng biểu thức chính quy (Regex) ---
+    static const std::regex ipRegex(R"(\b(?:\d{1,3}\.){3}\d{1,3}\b)");
+    static const std::regex userRegex(R"((?:user\s*=\s*|user:|user\s+)([a-zA-Z0-9_\-\.]+))", std::regex_constants::icase);
+
+    std::smatch ipMatch;
+    if (std::regex_search(out.message, ipMatch, ipRegex)) {
+        out.sourceIP = ipMatch.str(0);
+    } else {
+        out.sourceIP = "";
+    }
+
+    std::smatch userMatch;
+    if (std::regex_search(out.message, userMatch, userRegex)) {
+        if (userMatch.size() > 1) {
+            out.username = userMatch.str(1);
+        }
+    } else {
+        out.username = "";
+    }
 
     return true;
 }

@@ -30,6 +30,8 @@ public:
      * @param filename Tên file đang theo dõi.
      * @param topService Tên dịch vụ có nhiều lỗi nhất.
      * @param topCount Số lượng lỗi của dịch vụ đứng đầu.
+     * @param topIP Địa chỉ IP tấn công nhiều nhất.
+     * @param topIPCount Số lượng lỗi/ảnh hưởng do IP đứng đầu gây ra.
      * @param totalWarnings Tổng số cảnh báo hệ thống.
      * @param fatalCount Tổng số lỗi FATAL.
      * @param criticalCount Tổng số lỗi CRITICAL.
@@ -37,8 +39,9 @@ public:
      * @param alertHistory Lịch sử các cảnh báo nghiêm trọng gần đây.
      */
     static void renderLiveMonitor(int batchNum, int totalLogsProcessed, int totalThreats, const std::string& filename,
-                                  const std::string& topService, int topCount, int totalWarnings, int fatalCount, int criticalCount,
-                                  const Vector<std::string>& rollingBuffer, const Vector<std::string>& alertHistory);
+                                  const std::string& topService, int topCount, const std::string& topIP, int topIPCount, int totalWarnings,
+                                  int fatalCount, int criticalCount, const Vector<std::string>& rollingBuffer,
+                                  const Vector<std::string>& alertHistory);
 
     /**
      * @brief Cổng hiển thị bảng thống kê rút gọn (deprecated/fallback).
@@ -61,13 +64,15 @@ public:
      * @param stats Danh sách các chuỗi thống kê theo dịch vụ.
      * @param topService Tên dịch vụ có nhiều lỗi nhất.
      * @param topCount Số lượng lỗi của dịch vụ đứng đầu.
+     * @param topIP Địa chỉ IP tấn công nhiều nhất.
+     * @param topIPCount Số lượng lỗi/ảnh hưởng do IP đứng đầu gây ra.
      * @param fatalCount Tổng số lỗi FATAL.
      * @param criticalCount Tổng số lỗi CRITICAL.
      * @param totalWarnings Tổng số cảnh báo thông thường.
      */
     static void renderStatsDashboard(int totalLogsProcessed, int totalThreats, const std::string& filename,
-                                     const Vector<std::string>& stats, const std::string& topService, int topCount, int fatalCount,
-                                     int criticalCount, int totalWarnings);
+                                     const Vector<std::string>& stats, const std::string& topService, int topCount,
+                                     const std::string& topIP, int topIPCount, int fatalCount, int criticalCount, int totalWarnings);
 
     /**
      * @brief Định dạng một dòng log với nhãn màu mức độ nghiêm trọng.

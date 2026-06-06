@@ -10028,3 +10028,426 @@
 [2023-10-12 15:32:57] [CacheService] [INFO] Key cache hit
 [2023-10-12 15:33:00] [PaymentService] [ERROR] Payment gateway unreachable
 [2023-10-12 15:33:02] [NotificationService] [INFO] Email sent to user 6944
+[2023-10-12 15:34:05] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 198.51.100.45 for path /wp-admin/config.php
+[2023-10-12 15:34:05] [APIGateway] [INFO] Request routed to internal service from IP: 198.51.100.45
+[2023-10-12 15:34:10] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 203.0.113.12 for path /wp-admin/config.php
+[2023-10-12 15:34:10] [APIGateway] [INFO] Request routed to internal service from IP: 203.0.113.12
+[2023-10-12 15:34:15] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 192.0.2.88 for path /wp-admin/config.php
+[2023-10-12 15:34:15] [APIGateway] [INFO] Request routed to internal service from IP: 192.0.2.88
+[2023-10-12 15:34:20] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 198.51.100.99 for path /wp-admin/config.php
+[2023-10-12 15:34:20] [APIGateway] [INFO] Request routed to internal service from IP: 198.51.100.99
+[2023-10-12 15:34:25] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 185.220.101.5 for path /wp-admin/config.php
+[2023-10-12 15:34:25] [APIGateway] [INFO] Request routed to internal service from IP: 185.220.101.5
+[2023-10-12 15:34:30] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 198.51.100.45 for path /wp-admin/config.php
+[2023-10-12 15:34:30] [APIGateway] [INFO] Request routed to internal service from IP: 198.51.100.45
+[2023-10-12 15:34:35] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 203.0.113.12 for path /wp-admin/config.php
+[2023-10-12 15:34:35] [APIGateway] [INFO] Request routed to internal service from IP: 203.0.113.12
+[2023-10-12 15:34:40] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 192.0.2.88 for path /wp-admin/config.php
+[2023-10-12 15:34:40] [APIGateway] [INFO] Request routed to internal service from IP: 192.0.2.88
+[2023-10-12 15:34:45] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 198.51.100.99 for path /wp-admin/config.php
+[2023-10-12 15:34:45] [APIGateway] [INFO] Request routed to internal service from IP: 198.51.100.99
+[2023-10-12 15:34:50] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 185.220.101.5 for path /wp-admin/config.php
+[2023-10-12 15:34:50] [APIGateway] [INFO] Request routed to internal service from IP: 185.220.101.5
+[2023-10-12 15:34:55] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 198.51.100.45 for path /wp-admin/config.php
+[2023-10-12 15:34:55] [APIGateway] [INFO] Request routed to internal service from IP: 198.51.100.45
+[2023-10-12 15:35:00] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 203.0.113.12 for path /wp-admin/config.php
+[2023-10-12 15:35:00] [APIGateway] [INFO] Request routed to internal service from IP: 203.0.113.12
+[2023-10-12 15:35:05] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 192.0.2.88 for path /wp-admin/config.php
+[2023-10-12 15:35:05] [APIGateway] [INFO] Request routed to internal service from IP: 192.0.2.88
+[2023-10-12 15:35:10] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 198.51.100.99 for path /wp-admin/config.php
+[2023-10-12 15:35:10] [APIGateway] [INFO] Request routed to internal service from IP: 198.51.100.99
+[2023-10-12 15:35:15] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 185.220.101.5 for path /wp-admin/config.php
+[2023-10-12 15:35:15] [APIGateway] [INFO] Request routed to internal service from IP: 185.220.101.5
+[2023-10-12 15:35:20] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 198.51.100.45 for path /wp-admin/config.php
+[2023-10-12 15:35:20] [APIGateway] [INFO] Request routed to internal service from IP: 198.51.100.45
+[2023-10-12 15:35:25] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 203.0.113.12 for path /wp-admin/config.php
+[2023-10-12 15:35:25] [APIGateway] [INFO] Request routed to internal service from IP: 203.0.113.12
+[2023-10-12 15:35:30] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 192.0.2.88 for path /wp-admin/config.php
+[2023-10-12 15:35:30] [APIGateway] [INFO] Request routed to internal service from IP: 192.0.2.88
+[2023-10-12 15:35:35] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 198.51.100.99 for path /wp-admin/config.php
+[2023-10-12 15:35:35] [APIGateway] [INFO] Request routed to internal service from IP: 198.51.100.99
+[2023-10-12 15:35:40] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 185.220.101.5 for path /wp-admin/config.php
+[2023-10-12 15:35:40] [APIGateway] [INFO] Request routed to internal service from IP: 185.220.101.5
+[2023-10-12 15:35:45] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 198.51.100.45 for path /wp-admin/config.php
+[2023-10-12 15:35:45] [APIGateway] [INFO] Request routed to internal service from IP: 198.51.100.45
+[2023-10-12 15:35:50] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 203.0.113.12 for path /wp-admin/config.php
+[2023-10-12 15:35:50] [APIGateway] [INFO] Request routed to internal service from IP: 203.0.113.12
+[2023-10-12 15:35:55] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 192.0.2.88 for path /wp-admin/config.php
+[2023-10-12 15:35:55] [APIGateway] [INFO] Request routed to internal service from IP: 192.0.2.88
+[2023-10-12 15:36:00] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 198.51.100.99 for path /wp-admin/config.php
+[2023-10-12 15:36:00] [APIGateway] [INFO] Request routed to internal service from IP: 198.51.100.99
+[2023-10-12 15:36:05] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 185.220.101.5 for path /wp-admin/config.php
+[2023-10-12 15:36:05] [APIGateway] [INFO] Request routed to internal service from IP: 185.220.101.5
+[2023-10-12 15:36:10] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 198.51.100.45 for path /wp-admin/config.php
+[2023-10-12 15:36:10] [APIGateway] [INFO] Request routed to internal service from IP: 198.51.100.45
+[2023-10-12 15:36:15] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 203.0.113.12 for path /wp-admin/config.php
+[2023-10-12 15:36:15] [APIGateway] [INFO] Request routed to internal service from IP: 203.0.113.12
+[2023-10-12 15:36:20] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 192.0.2.88 for path /wp-admin/config.php
+[2023-10-12 15:36:20] [APIGateway] [INFO] Request routed to internal service from IP: 192.0.2.88
+[2023-10-12 15:36:25] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 198.51.100.99 for path /wp-admin/config.php
+[2023-10-12 15:36:25] [APIGateway] [INFO] Request routed to internal service from IP: 198.51.100.99
+[2023-10-12 15:36:30] [APIGateway] [WARNING] Suspicious path scanning detected from IP: 185.220.101.5 for path /wp-admin/config.php
+[2023-10-12 15:36:30] [APIGateway] [INFO] Request routed to internal service from IP: 185.220.101.5
+[2023-10-12 15:36:30] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 198.51.100.45
+[2023-10-12 15:36:30] [AuthService] [ERROR] User account locked for user admin
+[2023-10-12 15:36:31] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 203.0.113.12
+[2023-10-12 15:36:31] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 192.0.2.88
+[2023-10-12 15:36:32] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 198.51.100.99
+[2023-10-12 15:36:32] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 185.220.101.5
+[2023-10-12 15:36:33] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 198.51.100.45
+[2023-10-12 15:36:33] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 203.0.113.12
+[2023-10-12 15:36:34] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 192.0.2.88
+[2023-10-12 15:36:34] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 198.51.100.99
+[2023-10-12 15:36:35] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 185.220.101.5
+[2023-10-12 15:36:35] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 198.51.100.45
+[2023-10-12 15:36:35] [AuthService] [ERROR] User account locked for user db_backup
+[2023-10-12 15:36:36] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 203.0.113.12
+[2023-10-12 15:36:36] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 192.0.2.88
+[2023-10-12 15:36:37] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 198.51.100.99
+[2023-10-12 15:36:37] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 185.220.101.5
+[2023-10-12 15:36:38] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 198.51.100.45
+[2023-10-12 15:36:38] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 203.0.113.12
+[2023-10-12 15:36:39] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 192.0.2.88
+[2023-10-12 15:36:39] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 198.51.100.99
+[2023-10-12 15:36:40] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 185.220.101.5
+[2023-10-12 15:36:40] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 198.51.100.45
+[2023-10-12 15:36:40] [AuthService] [ERROR] User account locked for user sysadmin
+[2023-10-12 15:36:41] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 203.0.113.12
+[2023-10-12 15:36:41] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 192.0.2.88
+[2023-10-12 15:36:42] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 198.51.100.99
+[2023-10-12 15:36:42] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 185.220.101.5
+[2023-10-12 15:36:43] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 198.51.100.45
+[2023-10-12 15:36:43] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 203.0.113.12
+[2023-10-12 15:36:44] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 192.0.2.88
+[2023-10-12 15:36:44] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 198.51.100.99
+[2023-10-12 15:36:45] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 185.220.101.5
+[2023-10-12 15:36:45] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 198.51.100.45
+[2023-10-12 15:36:45] [AuthService] [ERROR] User account locked for user root
+[2023-10-12 15:36:46] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 203.0.113.12
+[2023-10-12 15:36:46] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 192.0.2.88
+[2023-10-12 15:36:47] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 198.51.100.99
+[2023-10-12 15:36:47] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 185.220.101.5
+[2023-10-12 15:36:48] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 198.51.100.45
+[2023-10-12 15:36:48] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 203.0.113.12
+[2023-10-12 15:36:49] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 192.0.2.88
+[2023-10-12 15:36:49] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 198.51.100.99
+[2023-10-12 15:36:50] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 185.220.101.5
+[2023-10-12 15:36:50] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 198.51.100.45
+[2023-10-12 15:36:50] [AuthService] [ERROR] User account locked for user administrator
+[2023-10-12 15:36:51] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 203.0.113.12
+[2023-10-12 15:36:51] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 192.0.2.88
+[2023-10-12 15:36:52] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 198.51.100.99
+[2023-10-12 15:36:52] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 185.220.101.5
+[2023-10-12 15:36:53] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 198.51.100.45
+[2023-10-12 15:36:53] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 203.0.113.12
+[2023-10-12 15:36:54] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 192.0.2.88
+[2023-10-12 15:36:54] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 198.51.100.99
+[2023-10-12 15:36:55] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 185.220.101.5
+[2023-10-12 15:36:55] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 198.51.100.45
+[2023-10-12 15:36:55] [AuthService] [ERROR] User account locked for user admin
+[2023-10-12 15:36:56] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 203.0.113.12
+[2023-10-12 15:36:56] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 192.0.2.88
+[2023-10-12 15:36:57] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 198.51.100.99
+[2023-10-12 15:36:57] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 185.220.101.5
+[2023-10-12 15:36:58] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 198.51.100.45
+[2023-10-12 15:36:58] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 203.0.113.12
+[2023-10-12 15:36:59] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 192.0.2.88
+[2023-10-12 15:36:59] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 198.51.100.99
+[2023-10-12 15:37:00] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 185.220.101.5
+[2023-10-12 15:37:00] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 198.51.100.45
+[2023-10-12 15:37:00] [AuthService] [ERROR] User account locked for user db_backup
+[2023-10-12 15:37:01] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 203.0.113.12
+[2023-10-12 15:37:01] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 192.0.2.88
+[2023-10-12 15:37:02] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 198.51.100.99
+[2023-10-12 15:37:02] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 185.220.101.5
+[2023-10-12 15:37:03] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 198.51.100.45
+[2023-10-12 15:37:03] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 203.0.113.12
+[2023-10-12 15:37:04] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 192.0.2.88
+[2023-10-12 15:37:04] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 198.51.100.99
+[2023-10-12 15:37:05] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 185.220.101.5
+[2023-10-12 15:37:05] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 198.51.100.45
+[2023-10-12 15:37:05] [AuthService] [ERROR] User account locked for user sysadmin
+[2023-10-12 15:37:06] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 203.0.113.12
+[2023-10-12 15:37:06] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 192.0.2.88
+[2023-10-12 15:37:07] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 198.51.100.99
+[2023-10-12 15:37:07] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 185.220.101.5
+[2023-10-12 15:37:08] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 198.51.100.45
+[2023-10-12 15:37:08] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 203.0.113.12
+[2023-10-12 15:37:09] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 192.0.2.88
+[2023-10-12 15:37:09] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 198.51.100.99
+[2023-10-12 15:37:10] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 185.220.101.5
+[2023-10-12 15:37:10] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 198.51.100.45
+[2023-10-12 15:37:10] [AuthService] [ERROR] User account locked for user root
+[2023-10-12 15:37:11] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 203.0.113.12
+[2023-10-12 15:37:11] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 192.0.2.88
+[2023-10-12 15:37:12] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 198.51.100.99
+[2023-10-12 15:37:12] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 185.220.101.5
+[2023-10-12 15:37:13] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 198.51.100.45
+[2023-10-12 15:37:13] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 203.0.113.12
+[2023-10-12 15:37:14] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 192.0.2.88
+[2023-10-12 15:37:14] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 198.51.100.99
+[2023-10-12 15:37:15] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 185.220.101.5
+[2023-10-12 15:37:15] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 198.51.100.45
+[2023-10-12 15:37:15] [AuthService] [ERROR] User account locked for user administrator
+[2023-10-12 15:37:16] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 203.0.113.12
+[2023-10-12 15:37:16] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 192.0.2.88
+[2023-10-12 15:37:17] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 198.51.100.99
+[2023-10-12 15:37:17] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 185.220.101.5
+[2023-10-12 15:37:18] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 198.51.100.45
+[2023-10-12 15:37:18] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 203.0.113.12
+[2023-10-12 15:37:19] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 192.0.2.88
+[2023-10-12 15:37:19] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 198.51.100.99
+[2023-10-12 15:37:20] [AuthService] [WARNING] Multiple failed login attempts for user sysadmin from IP: 185.220.101.5
+[2023-10-12 15:37:20] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 198.51.100.45
+[2023-10-12 15:37:20] [AuthService] [ERROR] User account locked for user admin
+[2023-10-12 15:37:21] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 203.0.113.12
+[2023-10-12 15:37:21] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 192.0.2.88
+[2023-10-12 15:37:22] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 198.51.100.99
+[2023-10-12 15:37:22] [AuthService] [WARNING] Multiple failed login attempts for user admin from IP: 185.220.101.5
+[2023-10-12 15:37:23] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 198.51.100.45
+[2023-10-12 15:37:23] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 203.0.113.12
+[2023-10-12 15:37:24] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 192.0.2.88
+[2023-10-12 15:37:24] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 198.51.100.99
+[2023-10-12 15:37:25] [AuthService] [WARNING] Multiple failed login attempts for user root from IP: 185.220.101.5
+[2023-10-12 15:37:25] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 198.51.100.45
+[2023-10-12 15:37:25] [AuthService] [ERROR] User account locked for user db_backup
+[2023-10-12 15:37:26] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 203.0.113.12
+[2023-10-12 15:37:26] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 192.0.2.88
+[2023-10-12 15:37:27] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 198.51.100.99
+[2023-10-12 15:37:27] [AuthService] [WARNING] Multiple failed login attempts for user db_backup from IP: 185.220.101.5
+[2023-10-12 15:37:28] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 198.51.100.45
+[2023-10-12 15:37:28] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 203.0.113.12
+[2023-10-12 15:37:29] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 192.0.2.88
+[2023-10-12 15:37:29] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 198.51.100.99
+[2023-10-12 15:37:30] [AuthService] [WARNING] Multiple failed login attempts for user administrator from IP: 185.220.101.5
+[2023-10-12 15:37:32] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.45
+[2023-10-12 15:37:32] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.45
+[2023-10-12 15:37:32] [DBService] [ERROR] Deadlock detected during concurrent attack access
+[2023-10-12 15:37:34] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 203.0.113.12
+[2023-10-12 15:37:34] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 203.0.113.12
+[2023-10-12 15:37:36] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 192.0.2.88
+[2023-10-12 15:37:36] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 192.0.2.88
+[2023-10-12 15:37:38] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.99
+[2023-10-12 15:37:38] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.99
+[2023-10-12 15:37:40] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 185.220.101.5
+[2023-10-12 15:37:40] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 185.220.101.5
+[2023-10-12 15:37:42] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.45
+[2023-10-12 15:37:42] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.45
+[2023-10-12 15:37:44] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 203.0.113.12
+[2023-10-12 15:37:44] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 203.0.113.12
+[2023-10-12 15:37:46] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 192.0.2.88
+[2023-10-12 15:37:46] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 192.0.2.88
+[2023-10-12 15:37:48] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.99
+[2023-10-12 15:37:48] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.99
+[2023-10-12 15:37:48] [DBService] [ERROR] Deadlock detected during concurrent attack access
+[2023-10-12 15:37:50] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 185.220.101.5
+[2023-10-12 15:37:50] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 185.220.101.5
+[2023-10-12 15:37:52] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.45
+[2023-10-12 15:37:52] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.45
+[2023-10-12 15:37:54] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 203.0.113.12
+[2023-10-12 15:37:54] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 203.0.113.12
+[2023-10-12 15:37:56] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 192.0.2.88
+[2023-10-12 15:37:56] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 192.0.2.88
+[2023-10-12 15:37:58] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.99
+[2023-10-12 15:37:58] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.99
+[2023-10-12 15:38:00] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 185.220.101.5
+[2023-10-12 15:38:00] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 185.220.101.5
+[2023-10-12 15:38:02] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.45
+[2023-10-12 15:38:02] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.45
+[2023-10-12 15:38:04] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 203.0.113.12
+[2023-10-12 15:38:04] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 203.0.113.12
+[2023-10-12 15:38:04] [DBService] [ERROR] Deadlock detected during concurrent attack access
+[2023-10-12 15:38:06] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 192.0.2.88
+[2023-10-12 15:38:06] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 192.0.2.88
+[2023-10-12 15:38:08] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.99
+[2023-10-12 15:38:08] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.99
+[2023-10-12 15:38:10] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 185.220.101.5
+[2023-10-12 15:38:10] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 185.220.101.5
+[2023-10-12 15:38:12] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.45
+[2023-10-12 15:38:12] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.45
+[2023-10-12 15:38:14] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 203.0.113.12
+[2023-10-12 15:38:14] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 203.0.113.12
+[2023-10-12 15:38:16] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 192.0.2.88
+[2023-10-12 15:38:16] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 192.0.2.88
+[2023-10-12 15:38:18] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.99
+[2023-10-12 15:38:18] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.99
+[2023-10-12 15:38:20] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 185.220.101.5
+[2023-10-12 15:38:20] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 185.220.101.5
+[2023-10-12 15:38:20] [DBService] [ERROR] Deadlock detected during concurrent attack access
+[2023-10-12 15:38:22] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.45
+[2023-10-12 15:38:22] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.45
+[2023-10-12 15:38:24] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 203.0.113.12
+[2023-10-12 15:38:24] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 203.0.113.12
+[2023-10-12 15:38:26] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 192.0.2.88
+[2023-10-12 15:38:26] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 192.0.2.88
+[2023-10-12 15:38:28] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.99
+[2023-10-12 15:38:28] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.99
+[2023-10-12 15:38:30] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 185.220.101.5
+[2023-10-12 15:38:30] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 185.220.101.5
+[2023-10-12 15:38:32] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.45
+[2023-10-12 15:38:32] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.45
+[2023-10-12 15:38:34] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 203.0.113.12
+[2023-10-12 15:38:34] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 203.0.113.12
+[2023-10-12 15:38:36] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 192.0.2.88
+[2023-10-12 15:38:36] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 192.0.2.88
+[2023-10-12 15:38:36] [DBService] [ERROR] Deadlock detected during concurrent attack access
+[2023-10-12 15:38:38] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.99
+[2023-10-12 15:38:38] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.99
+[2023-10-12 15:38:40] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 185.220.101.5
+[2023-10-12 15:38:40] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 185.220.101.5
+[2023-10-12 15:38:42] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.45
+[2023-10-12 15:38:42] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.45
+[2023-10-12 15:38:44] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 203.0.113.12
+[2023-10-12 15:38:44] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 203.0.113.12
+[2023-10-12 15:38:46] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 192.0.2.88
+[2023-10-12 15:38:46] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 192.0.2.88
+[2023-10-12 15:38:48] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.99
+[2023-10-12 15:38:48] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.99
+[2023-10-12 15:38:50] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 185.220.101.5
+[2023-10-12 15:38:50] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 185.220.101.5
+[2023-10-12 15:38:52] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.45
+[2023-10-12 15:38:52] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.45
+[2023-10-12 15:38:52] [DBService] [ERROR] Deadlock detected during concurrent attack access
+[2023-10-12 15:38:54] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 203.0.113.12
+[2023-10-12 15:38:54] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 203.0.113.12
+[2023-10-12 15:38:56] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 192.0.2.88
+[2023-10-12 15:38:56] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 192.0.2.88
+[2023-10-12 15:38:58] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.99
+[2023-10-12 15:38:58] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.99
+[2023-10-12 15:39:00] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 185.220.101.5
+[2023-10-12 15:39:00] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 185.220.101.5
+[2023-10-12 15:39:02] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.45
+[2023-10-12 15:39:02] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.45
+[2023-10-12 15:39:04] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 203.0.113.12
+[2023-10-12 15:39:04] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 203.0.113.12
+[2023-10-12 15:39:06] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 192.0.2.88
+[2023-10-12 15:39:06] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 192.0.2.88
+[2023-10-12 15:39:08] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 198.51.100.99
+[2023-10-12 15:39:08] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 198.51.100.99
+[2023-10-12 15:39:08] [DBService] [ERROR] Deadlock detected during concurrent attack access
+[2023-10-12 15:39:10] [APIGateway] [CRITICAL] WAF bypassed by malicious payload from IP: 185.220.101.5
+[2023-10-12 15:39:10] [DBService] [ERROR] Query syntax error detected: UNION SELECT from IP: 185.220.101.5
+[2023-10-12 15:39:11] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:11] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:11] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:12] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:12] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:12] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:13] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:13] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:13] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:14] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:14] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:14] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:15] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:15] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:15] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:16] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:16] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:16] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:17] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:17] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:17] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:18] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:18] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:18] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:19] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:19] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:19] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:20] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:20] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:20] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:21] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:21] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:21] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:22] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:22] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:22] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:23] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:23] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:23] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:24] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:24] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:24] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:25] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:25] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:25] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:26] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:26] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:26] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:27] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:27] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:27] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:28] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:28] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:28] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:29] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:29] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:29] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:30] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:30] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:30] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:31] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:31] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:31] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:32] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:32] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:32] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:33] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:33] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:33] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:34] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:34] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:34] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:35] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:35] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:35] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:36] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:36] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:36] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:37] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:37] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:37] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:38] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:38] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:38] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:39] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:39] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:39] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:40] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:40] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:40] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:41] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:41] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:41] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:42] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:42] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:42] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:43] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:43] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:43] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:44] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:44] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:44] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:45] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:45] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:45] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:46] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:46] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:46] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:47] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:47] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:47] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:48] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:48] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:48] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:49] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:49] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:49] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:50] [AuthService] [INFO] User db_backup login successful from IP: 185.220.101.5
+[2023-10-12 15:39:50] [DBService] [WARNING] High memory usage detected - Large data export request from user db_backup
+[2023-10-12 15:39:50] [NotificationService] [WARNING] High network traffic from DBService to IP: 185.220.101.5
+[2023-10-12 15:39:50] [DBService] [FATAL] Split brain detected - primary nodes offline
+[2023-10-12 15:39:50] [CacheService] [CRITICAL] Cluster consensus lost
+[2023-10-12 15:39:50] [AuthService] [FATAL] Auth database corrupted
+[2023-10-12 15:39:50] [APIGateway] [FATAL] Gateway crashed under concurrent request load

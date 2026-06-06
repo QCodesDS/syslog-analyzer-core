@@ -8,6 +8,7 @@
 
 #include "../../lib/HashTable.hpp"
 #include "../../lib/PriorityQueue.hpp"
+#include "../../lib/Queue.hpp"
 #include "../../lib/Trie.hpp"
 #include "../core/Log.h"
 
@@ -55,6 +56,9 @@ private:
     int threshold;                                        /**< @brief Ngưỡng lỗi kích hoạt cảnh báo dịch vụ. */
     int fatalCount;                                       /**< @brief Tổng số lỗi FATAL. */
     int criticalCount;                                    /**< @brief Tổng số lỗi CRITICAL. */
+    HashTable<std::string, Queue<long long>> ipTimeWindow; /**< @brief Bảng băm lưu trữ hàng đợi timestamp của các hoạt động lỗi cho mỗi IP nguồn. */
+    HashTable<std::string, int> ipErrorCount;              /**< @brief Bảng băm lưu trữ tổng số lỗi của mỗi IP nguồn. */
+    int timeWindowSeconds;                                 /**< @brief Độ rộng cửa sổ thời gian (giây) để theo dõi IP. */
 
     /**
      * @brief Tăng bộ đếm lỗi cho một dịch vụ.
@@ -85,12 +89,20 @@ private:
      */
     std::string formatStatLine(const std::string& serviceID, int count);
 
+    /**
+     * @brief Loại bỏ các nhãn thời gian đã cũ nằm ngoài cửa sổ thời gian khỏi hàng đợi.
+     * @param q Hàng đợi các nhãn thời gian của một IP.
+     * @param currentTime Thời gian hiện tại cần so sánh.
+     */
+    void pruneOldTimestamps(Queue<long long>& q, long long currentTime);
+
 public:
     /**
      * @brief Khởi tạo hệ thống giám sát log.
      * @param alertThreshold Ngưỡng cảnh báo (mặc định được lấy từ Constants.h).
+     * @param windowSeconds Ngưỡng thời gian của cửa sổ trượt (mặc định 60 giây).
      */
-    LogMonitor(int alertThreshold = DEFAULT_ALERT_THRESHOLD);
+    LogMonitor(int alertThreshold = DEFAULT_ALERT_THRESHOLD, int windowSeconds = 60);
 
     /**
      * @brief Phân tích một dòng log và cập nhật trạng thái bên trong.
@@ -142,6 +154,13 @@ public:
      * @param topCount Biến tham chiếu lưu số lượng lỗi của dịch vụ đó.
      */
     void findTopThreat(std::string& topService, int& topCount);
+
+    /**
+     * @brief Tìm ra địa chỉ IP gây ra nhiều lỗi nhất hiện tại.
+     * @param topIP Biến tham chiếu lưu địa chỉ IP lỗi nhiều nhất.
+     * @param topCount Biến tham chiếu lưu tổng số lỗi của địa chỉ IP đó.
+     */
+    void findTopMaliciousIP(std::string& topIP, int& topCount);
 };
 
 #endif  // LOGMONITOR_H

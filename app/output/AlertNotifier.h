@@ -30,6 +30,15 @@ public:
     static std::string formatCritical(const Log& log);
 
     /**
+     * @brief Định dạng chuỗi thông báo khi một địa chỉ IP vượt ngưỡng cảnh báo trong cửa sổ thời gian.
+     * @param ip Địa chỉ IP nguồn.
+     * @param count Số lượng hoạt động đáng ngờ phát hiện được trong cửa sổ thời gian.
+     * @param lastLog Đối tượng log cuối cùng liên quan đến IP này.
+     * @return std::string Chuỗi cảnh báo IP đã được định dạng.
+     */
+    static std::string formatIPAlert(const std::string& ip, int count, const Log& lastLog);
+
+    /**
      * @brief In trực tiếp thông báo vượt ngưỡng lỗi ra console.
      * @param log Đối tượng log gây ra cảnh báo.
      * @param count Số lượng lỗi hiện tại của dịch vụ.

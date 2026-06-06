@@ -195,8 +195,13 @@ int main(int argc, char* argv[]) {
             int topCount = 0;
             monitor.findTopThreat(topService, topCount);
 
-            Renderer::renderLiveMonitor(batchNum, totalLogsProcessed, totalThreatsCount, filename, topService, topCount, totalWarningsCount,
-                                        monitor.getFatalCount(), monitor.getCriticalCount(), rollingBuffer, alertHistory);
+            std::string topIP;
+            int topIPCount = 0;
+            monitor.findTopMaliciousIP(topIP, topIPCount);
+
+            Renderer::renderLiveMonitor(batchNum, totalLogsProcessed, totalThreatsCount, filename, topService, topCount, topIP, topIPCount,
+                                        totalWarningsCount, monitor.getFatalCount(), monitor.getCriticalCount(), rollingBuffer,
+                                        alertHistory);
         }
 
         if (state == STATISTICS && (statsViewDirty || batchHasContent)) {
@@ -204,8 +209,12 @@ int main(int argc, char* argv[]) {
             int topCount = 0;
             monitor.findTopThreat(topService, topCount);
 
-            Renderer::renderStatsDashboard(totalLogsProcessed, totalThreatsCount, filename, monitor.getStats(), topService, topCount,
-                                           monitor.getFatalCount(), monitor.getCriticalCount(), totalWarningsCount);
+            std::string topIP;
+            int topIPCount = 0;
+            monitor.findTopMaliciousIP(topIP, topIPCount);
+
+            Renderer::renderStatsDashboard(totalLogsProcessed, totalThreatsCount, filename, monitor.getStats(), topService, topCount, topIP,
+                                           topIPCount, monitor.getFatalCount(), monitor.getCriticalCount(), totalWarningsCount);
 
             statsViewDirty = false;
         }
@@ -243,7 +252,7 @@ int main(int argc, char* argv[]) {
 
     Renderer::clearScreen();
     std::cout << "\033[1;36m================================================================================\033[0m\n";
-    std::cout << "  \033[1;37mDistributed Log Analyzer v1.0.0\033[0m | \033[1;33mSystem Shutdown\033[0m\n";
+    std::cout << "  \033[1;37mDistributed Log Analyzer v2.0.0\033[0m | \033[1;33mSystem Shutdown\033[0m\n";
     std::cout << "  Status: \033[1;31m[EXITED]\033[0m | Thank you for using the system!\n";
     std::cout << "\033[1;36m================================================================================\033[0m\n";
 

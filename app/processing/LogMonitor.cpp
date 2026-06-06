@@ -5,9 +5,46 @@
 
 #include "LogMonitor.h"
 
+#include <ctime>
+
 #include "../output/AlertNotifier.h"
 
-LogMonitor::LogMonitor(int alertThreshold) : threshold(alertThreshold), fatalCount(0), criticalCount(0) {
+/**
+ * @brief Chuyển đổi chuỗi timestamp dạng YYYY-MM-DD HH:MM:SS sang Epoch time.
+ * @param timestampStr Chuỗi timestamp cần chuyển đổi.
+ * @return long long Epoch time tính bằng giây.
+ */
+static long long parseTimestampToUnix(const std::string& timestampStr) {
+    if (timestampStr.size() < 19)
+        return 0;
+    std::tm t = {};
+    try {
+        int year = std::stoi(timestampStr.substr(0, 4));
+        int month = std::stoi(timestampStr.substr(5, 2));
+        int day = std::stoi(timestampStr.substr(8, 2));
+        int hour = std::stoi(timestampStr.substr(11, 2));
+        int minute = std::stoi(timestampStr.substr(14, 2));
+        int second = std::stoi(timestampStr.substr(17, 2));
+
+        t.tm_year = year - 1900;
+        t.tm_mon = month - 1;
+        t.tm_mday = day;
+        t.tm_hour = hour;
+        t.tm_min = minute;
+        t.tm_sec = second;
+        t.tm_isdst = -1;
+    } catch (...) {
+        return 0;
+    }
+
+    std::time_t epoch = std::mktime(&t);
+    if (epoch == -1)
+        return 0;
+    return static_cast<long long>(epoch);
+}
+
+LogMonitor::LogMonitor(int alertThreshold, int windowSeconds)
+    : threshold(alertThreshold), fatalCount(0), criticalCount(0), timeWindowSeconds(windowSeconds) {
     // Thêm các từ khóa cảnh báo quan trọng vào bộ lọc Trie
     keywordFilter.insert("ERROR");
     keywordFilter.insert("FATAL");
@@ -55,6 +92,38 @@ void LogMonitor::analyzeLog(const Log& log) {
         if (shouldTriggerAlert(log.serviceID, updatedCount)) {
             pendingAlerts.pushBack(AlertNotifier::formatNotify(log, updatedCount));
         }
+
+        // Theo dõi và phân tích cửa sổ thời gian trượt đối với địa chỉ IP nguồn
+        if (!log.sourceIP.empty()) {
+            long long currentTime = parseTimestampToUnix(log.timestamp);
+            Queue<long long>* q = ipTimeWindow.find(log.sourceIP);
+            if (!q) {
+                Queue<long long> newQ;
+                ipTimeWindow.insert(Pair<std::string, Queue<long long>>(log.sourceIP, newQ));
+                q = ipTimeWindow.find(log.sourceIP);
+            }
+            if (q) {
+                q->enqueue(currentTime);
+                pruneOldTimestamps(*q, currentTime);
+
+                // Tăng tổng số lỗi của IP nguồn
+                int* existingIPCount = ipErrorCount.find(log.sourceIP);
+                int previousIPCount = existingIPCount ? *existingIPCount : 0;
+                int updatedIPCount = previousIPCount + 1;
+                ipErrorCount.insert(Pair<std::string, int>(log.sourceIP, updatedIPCount));
+
+                // Kích hoạt cảnh báo nếu số lượng lỗi trong cửa sổ trượt vượt ngưỡng
+                if (q->size() >= threshold) {
+                    pendingAlerts.pushBack(AlertNotifier::formatIPAlert(log.sourceIP, q->size(), log));
+                }
+            }
+        }
+    }
+}
+
+void LogMonitor::pruneOldTimestamps(Queue<long long>& q, long long currentTime) {
+    while (!q.empty() && (currentTime - q.front() > timeWindowSeconds)) {
+        q.dequeue();
     }
 }
 
@@ -109,6 +178,20 @@ void LogMonitor::findTopThreat(std::string& topService, int& topCount) {
         if (items[i].value > topCount) {
             topCount = items[i].value;
             topService = items[i].key;
+        }
+    }
+}
+
+void LogMonitor::findTopMaliciousIP(std::string& topIP, int& topCount) {
+    topIP = "None";
+    topCount = 0;
+    Vector<Pair<std::string, int>> items = ipErrorCount.lnr();
+
+    // Tìm kiếm tuyến tính địa chỉ IP gây ra nhiều lỗi nhất
+    for (int i = 0; i < items.getSize(); i++) {
+        if (items[i].value > topCount) {
+            topCount = items[i].value;
+            topIP = items[i].key;
         }
     }
 }

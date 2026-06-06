@@ -55,12 +55,12 @@ std::string Renderer::formatLogLine(const std::string& timestamp, const std::str
 }
 
 void Renderer::renderLiveMonitor(int batchNum, int totalLogsProcessed, int totalThreats, const std::string& filename,
-                                 const std::string& topService, int topCount, int totalWarnings, int fatalCount, int criticalCount,
+                                 const std::string& topService, int topCount, const std::string& topIP, int topIPCount, int totalWarnings, int fatalCount, int criticalCount,
                                  const Vector<std::string>& rollingBuffer, const Vector<std::string>& alertHistory) {
     (void)batchNum;
     clearScreen();
     std::cout << "\033[1;36m================================================================================\033[0m\n";
-    std::cout << "  \033[1;37mDistributed Log Analyzer v1.0.0\033[0m | Target File: \033[1;33m" << filename << "\033[0m\n";
+    std::cout << "  \033[1;37mDistributed Log Analyzer v2.0.0\033[0m | Target File: \033[1;33m" << filename << "\033[0m\n";
     std::cout << "  Status: \033[1;32m[MONITORING]\033[0m | Total Logs Analyzed: \033[1;35m" << totalLogsProcessed
               << "\033[0m | Total Threats: \033[1;31m" << totalThreats << "\033[0m\n";
     std::cout << "\033[1;36m================================================================================\033[0m\n\n";
@@ -70,6 +70,12 @@ void Renderer::renderLiveMonitor(int batchNum, int totalLogsProcessed, int total
         std::cout << "  Most Critical Service: \033[0;90mNone\033[0m\n";
     } else {
         std::cout << "  Most Critical Service: \033[1;31m" << topService << "\033[0m (\033[1;33m" << topCount
+                  << "\033[0m incidents)\033[0m\n";
+    }
+    if (topIP.empty() || topIP == "None") {
+        std::cout << "  Top Malicious IP     : \033[0;90mNone\033[0m\n";
+    } else {
+        std::cout << "  Top Malicious IP     : \033[1;35m" << topIP << "\033[0m (\033[1;33m" << topIPCount
                   << "\033[0m incidents)\033[0m\n";
     }
     std::cout << "  Total System Warnings: \033[1;33m" << totalWarnings << "\033[0m | Fatal/Critical Errors: \033[1;31m"
@@ -102,11 +108,11 @@ void Renderer::renderLiveMonitor(int batchNum, int totalLogsProcessed, int total
 void Renderer::renderStatsDashboard(const Vector<std::string>& stats, const std::string& topService, int topCount, int fatalCount,
                                     int criticalCount) {
     // Phương thức rút gọn, định tuyến về phương thức đầy đủ
-    renderStatsDashboard(0, 0, "Unknown", stats, topService, topCount, fatalCount, criticalCount, 0);
+    renderStatsDashboard(0, 0, "Unknown", stats, topService, topCount, "None", 0, fatalCount, criticalCount, 0);
 }
 
 void Renderer::renderStatsDashboard(int totalLogsProcessed, int totalThreats, const std::string& filename, const Vector<std::string>& stats,
-                                    const std::string& topService, int topCount, int fatalCount, int criticalCount, int totalWarnings) {
+                                    const std::string& topService, int topCount, const std::string& topIP, int topIPCount, int fatalCount, int criticalCount, int totalWarnings) {
     clearScreen();
     std::cout << "\033[1;36m================================================================================\033[0m\n";
     std::cout << "  \033[1;37mSystem Health Dashboard\033[0m | Target File: \033[1;33m" << filename << "\033[0m\n";
@@ -139,6 +145,11 @@ void Renderer::renderStatsDashboard(int totalLogsProcessed, int totalThreats, co
         std::cout << "  Top System Threat    : \033[0;90mNone\033[0m\n";
     } else {
         std::cout << "  Top System Threat    : \033[1;31m" << topService << "\033[0m (\033[1;33m" << topCount << "\033[0m errors)\033[0m\n";
+    }
+    if (topIP.empty() || topIP == "None") {
+        std::cout << "  Top Malicious IP     : \033[0;90mNone\033[0m\n";
+    } else {
+        std::cout << "  Top Malicious IP     : \033[1;35m" << topIP << "\033[0m (\033[1;33m" << topIPCount << "\033[0m alerts)\033[0m\n";
     }
     std::cout << "  Fatal/Critical Errors: \033[1;31m" << (fatalCount + criticalCount) << "\033[0m events detected\n";
     std::cout << "  Total Warnings       : \033[1;33m" << totalWarnings << "\033[0m events detected\n";
