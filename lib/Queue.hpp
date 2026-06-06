@@ -2,15 +2,13 @@
 #define QUEUE_HPP
 
 #include "LinkedList.hpp"
-#include <stdexcept>
 
-template <typename T>
+template<typename T>
 class Queue {
 private:
     LinkedList<T> list;
 
 public:
-
     // Initializes an empty queue
     Queue() = default;
 
@@ -29,13 +27,12 @@ public:
     }
 
     // Enqueues a value at the back of the queue
-    void enqueue(const T& value) {
-        list.insertBack(value);
-    }
+    void enqueue(const T& value) { list.insertBack(value); }
 
     // Dequeues the front value from the queue
     bool dequeue() {
-        if (empty()) return false;
+        if (empty())
+            return false;
         list.removeAt(0);
         return true;
     }
@@ -49,14 +46,10 @@ public:
     }
 
     // Returns true if the queue has no elements
-    bool empty() const {
-        return list.size() == 0;
-    }
+    bool empty() const { return list.size() == 0; }
 
     // Returns the number of elements in the queue
-    int size() const {
-        return list.size();
-    }
+    int size() const { return list.size(); }
 };
 
-#endif // QUEUE_HPP
+#endif  // QUEUE_HPP

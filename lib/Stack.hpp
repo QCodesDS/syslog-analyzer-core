@@ -2,15 +2,13 @@
 #define STACK_HPP
 
 #include "LinkedList.hpp"
-#include <stdexcept>
 
-template <typename T>
+template<typename T>
 class Stack {
 private:
     LinkedList<T> list;
 
 public:
-
     // Initializes an empty stack
     Stack() = default;
 
@@ -29,13 +27,12 @@ public:
     }
 
     // Pushes a value onto the top of the stack
-    void push(const T& value) {
-        list.insertFront(value);
-    }
+    void push(const T& value) { list.insertFront(value); }
 
     // Pops the top value from the stack
     bool pop() {
-        if (empty()) return false;
+        if (empty())
+            return false;
         list.removeAt(0);
         return true;
     }
@@ -49,14 +46,10 @@ public:
     }
 
     // Returns true if the stack has no elements
-    bool empty() const {
-        return list.size() == 0;
-    }
+    bool empty() const { return list.size() == 0; }
 
     // Returns the number of elements in the stack
-    int size() const {
-        return list.size();
-    }
+    int size() const { return list.size(); }
 };
 
-#endif // STACK_HPP
+#endif  // STACK_HPP

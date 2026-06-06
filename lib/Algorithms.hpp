@@ -2,10 +2,9 @@
 #define ALGORITHMS_HPP
 
 #include "Vector.hpp"
-#include <functional>
 
 // Sorts elements using the Bubble Sort algorithm
-template <typename T, typename Comp = std::less<T>>
+template<typename T, typename Comp = std::less<T>>
 void bubbleSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
     int n = arr.getSize();
     for (int i = 0; i < n - 1; i++) {
@@ -18,12 +17,13 @@ void bubbleSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
                 swapped = true;
             }
         }
-        if (!swapped) break;
+        if (!swapped)
+            break;
     }
 }
 
 // Sorts elements using the Selection Sort algorithm
-template <typename T, typename Comp = std::less<T>>
+template<typename T, typename Comp = std::less<T>>
 void selectionSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
     int n = arr.getSize();
     for (int i = 0; i < n - 1; i++) {
@@ -42,7 +42,7 @@ void selectionSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
 }
 
 // Sorts elements using the Insertion Sort algorithm
-template <typename T, typename Comp = std::less<T>>
+template<typename T, typename Comp = std::less<T>>
 void insertionSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
     int n = arr.getSize();
     for (int i = 1; i < n; i++) {
@@ -57,7 +57,7 @@ void insertionSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
 }
 
 // Helper for heapSort to maintain heap property
-template <typename T, typename Comp>
+template<typename T, typename Comp>
 void heapify(Vector<T>& arr, int n, int i, Comp cmp) {
     int largest = i;
     int left = 2 * i + 1;
@@ -78,7 +78,7 @@ void heapify(Vector<T>& arr, int n, int i, Comp cmp) {
 }
 
 // Sorts elements using the Heap Sort algorithm
-template <typename T, typename Comp = std::less<T>>
+template<typename T, typename Comp = std::less<T>>
 void heapSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
     int n = arr.getSize();
     for (int i = n / 2 - 1; i >= 0; i--) {
@@ -93,7 +93,7 @@ void heapSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
 }
 
 // Helper for quickSort to partition the array
-template <typename T, typename Comp>
+template<typename T, typename Comp>
 int partition(Vector<T>& arr, int lo, int hi, Comp cmp) {
     T pivot = arr[hi];
     int i = lo - 1;
@@ -112,7 +112,7 @@ int partition(Vector<T>& arr, int lo, int hi, Comp cmp) {
 }
 
 // Sorts elements using the Quick Sort algorithm
-template <typename T, typename Comp = std::less<T>>
+template<typename T, typename Comp = std::less<T>>
 void quickSort(Vector<T>& arr, int lo, int hi, Comp cmp = std::less<T>()) {
     if (lo < hi) {
         int pi = partition(arr, lo, hi, cmp);
@@ -122,7 +122,7 @@ void quickSort(Vector<T>& arr, int lo, int hi, Comp cmp = std::less<T>()) {
 }
 
 // Helper for mergeSort to merge two halves
-template <typename T, typename Comp>
+template<typename T, typename Comp>
 void merge(Vector<T>& arr, int lo, int mid, int hi, Comp cmp) {
     int n1 = mid - lo + 1;
     int n2 = hi - mid;
@@ -130,8 +130,10 @@ void merge(Vector<T>& arr, int lo, int mid, int hi, Comp cmp) {
     Vector<T> left(n1, T());
     Vector<T> right(n2, T());
 
-    for (int i = 0; i < n1; i++) left[i] = arr[lo + i];
-    for (int j = 0; j < n2; j++) right[j] = arr[mid + 1 + j];
+    for (int i = 0; i < n1; i++)
+        left[i] = arr[lo + i];
+    for (int j = 0; j < n2; j++)
+        right[j] = arr[mid + 1 + j];
 
     int i = 0, j = 0, k = lo;
     while (i < n1 && j < n2) {
@@ -157,7 +159,7 @@ void merge(Vector<T>& arr, int lo, int mid, int hi, Comp cmp) {
 }
 
 // Sorts elements using the Merge Sort algorithm
-template <typename T, typename Comp = std::less<T>>
+template<typename T, typename Comp = std::less<T>>
 void mergeSort(Vector<T>& arr, int lo, int hi, Comp cmp = std::less<T>()) {
     if (lo < hi) {
         int mid = lo + (hi - lo) / 2;
@@ -168,22 +170,24 @@ void mergeSort(Vector<T>& arr, int lo, int hi, Comp cmp = std::less<T>()) {
 }
 
 // Searches for a key using Linear Search, returns index or -1
-template <typename T>
+template<typename T>
 int linearSearch(const Vector<T>& arr, const T& key) {
     for (int i = 0; i < arr.getSize(); i++) {
-        if (arr[i] == key) return i;
+        if (arr[i] == key)
+            return i;
     }
     return -1;
 }
 
 // Searches for a key using Binary Search (assumes sorted), returns index or -1
-template <typename T>
+template<typename T>
 int binarySearch(const Vector<T>& arr, const T& key) {
     int lo = 0;
     int hi = arr.getSize() - 1;
     while (lo <= hi) {
         int mid = lo + (hi - lo) / 2;
-        if (arr[mid] == key) return mid;
+        if (arr[mid] == key)
+            return mid;
         if (arr[mid] < key) {
             lo = mid + 1;
         } else {
@@ -193,4 +197,4 @@ int binarySearch(const Vector<T>& arr, const T& key) {
     return -1;
 }
 
-#endif // ALGORITHMS_HPP
+#endif  // ALGORITHMS_HPP

@@ -1,11 +1,15 @@
+/**
+ * @file main.cpp
+ * @brief Giao diện dòng lệnh và vòng lặp xử lý sự kiện chính của ứng dụng.
+ */
 #include <chrono>
-#include <cstdlib>
 #include <iostream>
 #include <string>
 #include <thread>
 
+#include "config/Constants.h"
 #include "core/LogParser.h"
-#include "output/AlertNotifier.h"
+#include "output/Renderer.h"
 #include "processing/LogMonitor.h"
 #include "source/LogReader.h"
 
@@ -38,8 +42,68 @@ int _getch() {
 }
 #endif
 
+/**
+ * @enum AppState
+ * @brief Định nghĩa các trạng thái giao diện của ứng dụng.
+ */
 enum AppState { LIVE_MONITOR, STATISTICS, EXIT };
 
+/**
+ * @brief Thêm một cảnh báo mới vào lịch sử hiển thị, ưu tiên giữ lại các cảnh báo nghiêm trọng.
+ * 
+ * Nếu lịch sử đã đầy, thuật toán sẽ cố gắng loại bỏ các cảnh báo ít nghiêm trọng hơn
+ * (không phải CRITICAL) để nhường chỗ cho cảnh báo mới.
+ * 
+ * @param alertHistory Danh sách lịch sử các cảnh báo.
+ * @param newAlert Chuỗi cảnh báo mới cần thêm vào.
+ */
+void addAlertToHistory(Vector<std::string>& alertHistory, const std::string& newAlert) {
+    bool isCritical = (newAlert.find("[CRITICAL ALERT]") != std::string::npos);
+
+    if (alertHistory.getSize() < MAX_ALERT_HISTORY) {
+        alertHistory.pushBack(newAlert);
+        return;
+    }
+
+    if (isCritical) {
+        int targetIdx = -1;
+        for (int i = 0; i < alertHistory.getSize(); i++) {
+            if (alertHistory[i].find("[CRITICAL ALERT]") == std::string::npos) {
+                targetIdx = i;
+                break;
+            }
+        }
+        if (targetIdx != -1) {
+            Vector<std::string> temp;
+            for (int i = 0; i < alertHistory.getSize(); i++) {
+                if (i != targetIdx) {
+                    temp.pushBack(alertHistory[i]);
+                }
+            }
+            temp.pushBack(newAlert);
+            alertHistory = temp;
+            return;
+        }
+    }
+
+    Vector<std::string> temp;
+    for (int i = 1; i < alertHistory.getSize(); i++) {
+        temp.pushBack(alertHistory[i]);
+    }
+    temp.pushBack(newAlert);
+    alertHistory = temp;
+}
+
+/**
+ * @brief Điểm khởi đầu của chương trình phân tích syslog.
+ * 
+ * Quản lý vòng lặp chính: Đọc lô dữ liệu, phân tích, định dạng dữ liệu đầu ra,
+ * cập nhật giao diện (live monitor hoặc thống kê) và xử lý phím bấm điều hướng.
+ * 
+ * @param argc Số lượng tham số dòng lệnh.
+ * @param argv Danh sách các tham số dòng lệnh.
+ * @return int Mã thoát chương trình (0 là thành công).
+ */
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <log_file> [--fast | --slow]\n";
@@ -47,17 +111,15 @@ int main(int argc, char* argv[]) {
     }
 
     std::string filename = "";
-    int batchSize = 200;
-    int windowSleepMs = 1000;
+    int batchSize = DEFAULT_BATCH_SIZE;
+    double sleepMultiplier = 1.0;
 
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
         if (arg == "--fast") {
-            batchSize = 50;
-            windowSleepMs = 200;
+            sleepMultiplier = FAST_SLEEP_MULTIPLIER;
         } else if (arg == "--slow") {
-            batchSize = 20;
-            windowSleepMs = 2000;
+            sleepMultiplier = SLOW_SLEEP_MULTIPLIER;
         } else {
             filename = arg;
         }
@@ -69,92 +131,121 @@ int main(int argc, char* argv[]) {
     }
 
     LogReader reader(filename);
-    LogMonitor monitor(10);  // alert threshold = 10
+    LogMonitor monitor(DEFAULT_ALERT_THRESHOLD);
 
     AppState state = LIVE_MONITOR;
-    bool needsStatsRedraw = false;
+    bool statsViewDirty = false;
+    int batchNum = 0;
+
+    Vector<std::string> rollingBuffer;
+    int totalLogsProcessed = 0;
+    int totalThreatsCount = 0;
+    int totalWarningsCount = 0;
+    Vector<std::string> alertHistory;
 
     std::cout << "\033[1;36m=== Distributed Log Analyzer ===\033[0m\n";
     std::cout << "Press 1: Live Monitor | 2: Statistics | Q: Quit\n";
 
     while (state != EXIT) {
-        if (_kbhit()) {
-            int ch = _getch();
-            if (ch == '1' && state != LIVE_MONITOR) {
-                state = LIVE_MONITOR;
-                std::cout << "\n[Switched to Live Monitor]\n";
-            } else if (ch == '2' && state != STATISTICS) {
-                state = STATISTICS;
-                needsStatsRedraw = true;
-            } else if (ch == 'q' || ch == 'Q') {
-                state = EXIT;
-                std::cout << "\n[Exiting...]\n";
-                break;
-            }
-        }
-
         Vector<std::string> batch = reader.readBatch(batchSize);
-        bool hasNewData = batch.getSize() > 0;
+        bool batchHasContent = batch.getSize() > 0;
+        if (batchHasContent) {
+            batchNum++;
+        }
         int alertCount = 0;
+
+        Vector<std::string> printBuffer;
 
         for (int i = 0; i < batch.getSize(); i++) {
             Log log;
             if (LogParser::parse(batch[i], log)) {
+                totalLogsProcessed++;
                 monitor.analyzeLog(log);
 
-                if (log.severity == "FATAL" || log.severity == "CRITICAL") {
+                if (log.severity == "ERROR" || log.severity == "FATAL" || log.severity == "CRITICAL") {
                     alertCount++;
+                    totalThreatsCount++;
+                } else if (log.severity == "WARN" || log.severity == "WARNING") {
+                    totalWarningsCount++;
                 }
 
-                if (state == LIVE_MONITOR) {
-                    if (log.severity == "FATAL" || log.severity == "CRITICAL") {
-                        std::cout << "\033[1;31m" << batch[i] << "\033[0m\n";
-                    } else if (log.severity == "ERROR") {
-                        std::cout << "\033[0;31m" << batch[i] << "\033[0m\n";
-                    } else if (log.severity == "WARN") {
-                        std::cout << "\033[0;33m" << batch[i] << "\033[0m\n";
-                    } else if (log.severity == "INFO") {
-                        std::cout << "\033[0;32m" << batch[i] << "\033[0m\n";
-                    } else {
-                        std::cout << "\033[0m" << batch[i] << "\033[0m\n";
-                    }
+                std::string formattedLine = Renderer::formatLogLine(log.timestamp, log.serviceID, log.severity, log.message);
+                printBuffer.pushBack(formattedLine);
+            }
+        }
+
+        for (int i = 0; i < printBuffer.getSize(); i++) {
+            rollingBuffer.pushBack(printBuffer[i]);
+        }
+        if (rollingBuffer.getSize() > MAX_ROLLING_LINES) {
+            Vector<std::string> trimmed;
+            int start = rollingBuffer.getSize() - MAX_ROLLING_LINES;
+            for (int i = start; i < rollingBuffer.getSize(); i++)
+                trimmed.pushBack(rollingBuffer[i]);
+            rollingBuffer = trimmed;
+        }
+
+        Vector<std::string> alerts = monitor.flushAlerts();
+        for (int i = 0; i < alerts.getSize(); i++) {
+            addAlertToHistory(alertHistory, alerts[i]);
+        }
+
+        if (state == LIVE_MONITOR) {
+            std::string topService;
+            int topCount = 0;
+            monitor.findTopThreat(topService, topCount);
+
+            Renderer::renderLiveMonitor(batchNum, totalLogsProcessed, totalThreatsCount, filename, topService, topCount, totalWarningsCount,
+                                        monitor.getFatalCount(), monitor.getCriticalCount(), rollingBuffer, alertHistory);
+        }
+
+        if (state == STATISTICS && (statsViewDirty || batchHasContent)) {
+            std::string topService;
+            int topCount = 0;
+            monitor.findTopThreat(topService, topCount);
+
+            Renderer::renderStatsDashboard(totalLogsProcessed, totalThreatsCount, filename, monitor.getStats(), topService, topCount,
+                                           monitor.getFatalCount(), monitor.getCriticalCount(), totalWarningsCount);
+
+            statsViewDirty = false;
+        }
+
+        int dynamicSleep = SLEEP_ON_DATA_MS;
+        if (alertCount > 0) {
+            dynamicSleep = SLEEP_ON_ALERT_MS;
+        } else if (!batchHasContent) {
+            dynamicSleep = SLEEP_ON_EOF_MS;
+        }
+
+        int sleepDurationMs = static_cast<int>(dynamicSleep * sleepMultiplier);
+        if (sleepDurationMs < KEYBOARD_POLL_INTERVAL_MS)
+            sleepDurationMs = KEYBOARD_POLL_INTERVAL_MS;
+
+        int sleepElapsedMs = 0;
+        while (sleepElapsedMs < sleepDurationMs && state != EXIT) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(KEYBOARD_POLL_INTERVAL_MS));
+            sleepElapsedMs += KEYBOARD_POLL_INTERVAL_MS;
+            if (_kbhit()) {
+                int keyPressed = _getch();
+                if (keyPressed == '1' && state != LIVE_MONITOR) {
+                    state = LIVE_MONITOR;
+                    statsViewDirty = false;
+                } else if (keyPressed == '2' && state != STATISTICS) {
+                    state = STATISTICS;
+                    statsViewDirty = true;
+                } else if (keyPressed == 'q' || keyPressed == 'Q') {
+                    state = EXIT;
                 }
+                break;
             }
-        }
-
-        if (hasNewData) {
-            // Print batch summary
-            if (state == LIVE_MONITOR) {
-                std::cout << "\033[0;90m--- Batch: " << batch.getSize() << " lines processed";
-                if (alertCount > 0)
-                    std::cout << " | \033[1;31mAlerts: " << alertCount << "\033[0;90m";
-                std::cout << " ---\033[0m\n";
-            }
-
-            // 1-second analysis window (configurable)
-            std::this_thread::sleep_for(std::chrono::milliseconds(windowSleepMs));
-        }
-
-        if (state == STATISTICS && (needsStatsRedraw || hasNewData)) {
-#ifdef _WIN32
-            std::system("cls");
-#else
-            std::system("clear");
-#endif
-            std::cout << "\033[1;36m=== Current System Statistics ===\033[0m\n";
-            std::cout << "Press 1: Live Monitor | 2: Statistics | Q: Quit\n\n";
-
-            Vector<std::string> stats = monitor.getStats();
-            for (int i = 0; i < stats.getSize(); i++) {
-                std::cout << stats[i] << "\n";
-            }
-            needsStatsRedraw = false;
-        }
-
-        if (!hasNewData) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
     }
+
+    Renderer::clearScreen();
+    std::cout << "\033[1;36m================================================================================\033[0m\n";
+    std::cout << "  \033[1;37mDistributed Log Analyzer v1.0.0\033[0m | \033[1;33mSystem Shutdown\033[0m\n";
+    std::cout << "  Status: \033[1;31m[EXITED]\033[0m | Thank you for using the system!\n";
+    std::cout << "\033[1;36m================================================================================\033[0m\n";
 
     return 0;
 }

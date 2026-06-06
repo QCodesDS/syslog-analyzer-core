@@ -3,17 +3,17 @@
 
 #include "Vector.hpp"
 
-template <typename T>
+template<typename T>
 struct BSTNode {
     T value;
     BSTNode* left;
     BSTNode* right;
-    int height; // set to 0 for reuse in AVL
+    int height;  // set to 0 for reuse in AVL
 
     BSTNode(const T& val) : value(val), left(nullptr), right(nullptr), height(0) {}
 };
 
-template <typename T>
+template<typename T>
 class BST {
 private:
     BSTNode<T>* root;
@@ -29,9 +29,7 @@ public:
     BST& operator=(const BST&) = delete;
 
     // Destructor to free all heap memory
-    ~BST() {
-        clearTree();
-    }
+    ~BST() { clearTree(); }
 
     // Fully clears the tree
     void clearTree() {
@@ -40,19 +38,13 @@ public:
     }
 
     // Inserts a value into the BST
-    void insert(const T& value) {
-        root = insertNode(root, value);
-    }
+    void insert(const T& value) { root = insertNode(root, value); }
 
     // Removes a value from the BST
-    void remove(const T& value) {
-        root = removeNode(root, value);
-    }
+    void remove(const T& value) { root = removeNode(root, value); }
 
     // Searches for a value in the BST
-    bool search(const T& value) const {
-        return searchNode(root, value);
-    }
+    bool search(const T& value) const { return searchNode(root, value); }
 
     // Returns a vector containing the in-order traversal (LNR) of the BST
     Vector<T> lnr() const {
@@ -87,7 +79,8 @@ private:
 
     // Helper to insert a node
     BSTNode<T>* insertNode(BSTNode<T>* node, const T& value) {
-        if (!node) return new BSTNode<T>(value);
+        if (!node)
+            return new BSTNode<T>(value);
         if (value < node->value) {
             node->left = insertNode(node->left, value);
         } else if (value > node->value) {
@@ -106,7 +99,8 @@ private:
 
     // Helper to remove a node
     BSTNode<T>* removeNode(BSTNode<T>* node, const T& value) {
-        if (!node) return nullptr;
+        if (!node)
+            return nullptr;
 
         if (value < node->value) {
             node->left = removeNode(node->left, value);
@@ -132,9 +126,12 @@ private:
 
     // Helper to search for a value
     bool searchNode(BSTNode<T>* node, const T& value) const {
-        if (!node) return false;
-        if (value == node->value) return true;
-        if (value < node->value) return searchNode(node->left, value);
+        if (!node)
+            return false;
+        if (value == node->value)
+            return true;
+        if (value < node->value)
+            return searchNode(node->left, value);
         return searchNode(node->right, value);
     }
 
@@ -164,4 +161,4 @@ private:
     }
 };
 
-#endif // BST_HPP
+#endif  // BST_HPP

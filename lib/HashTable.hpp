@@ -1,57 +1,82 @@
+/**
+ * @file HashTable.hpp
+ * @brief Cài đặt Bảng Băm (Hash Table) kết hợp xử lý xung đột bằng cây AVL (Chaining-based).
+ */
+
 #ifndef HASHTABLE_HPP
 #define HASHTABLE_HPP
 
-#include <functional>
-
+#include "../app/config/Constants.h"
 #include "AVL.hpp"
 
+/**
+ * @struct Pair
+ * @brief Cấu trúc lưu trữ cặp Khóa - Giá trị (Key-Value) dùng cho bảng băm.
+ * @tparam K Kiểu dữ liệu của khóa.
+ * @tparam V Kiểu dữ liệu của giá trị.
+ */
 template<typename K, typename V>
 struct Pair {
-    K key;
-    V value;
+    K key;   /**< @brief Khóa định danh. */
+    V value; /**< @brief Giá trị được lưu trữ. */
 
     Pair() = default;
     Pair(const K& k, const V& v) : key(k), value(v) {}
-    Pair(const K& k) : key(k), value(V()) {}  // For searching
+    Pair(const K& k) : key(k), value(V()) {}
 
     bool operator<(const Pair& other) const { return key < other.key; }
     bool operator>(const Pair& other) const { return key > other.key; }
     bool operator==(const Pair& other) const { return key == other.key; }
 };
 
+/**
+ * @class HashTable
+ * @brief Cấu trúc dữ liệu Bảng Băm, giải quyết đụng độ bằng mảng các cây AVL.
+ * @tparam K Kiểu dữ liệu của khóa.
+ * @tparam V Kiểu dữ liệu của giá trị.
+ */
 template<typename K, typename V>
 class HashTable {
 private:
-    static const int TABLE_SIZE = 100;
-    AVL<Pair<K, V>> buckets[TABLE_SIZE];
-    int elementCount;
+    static const int TABLE_SIZE = HASHTABLE_SIZE; /**< @brief Số lượng bucket trong bảng băm. */
+    AVL<Pair<K, V>> buckets[TABLE_SIZE];          /**< @brief Mảng các cây AVL đóng vai trò là các bucket. */
+    int elementCount;                             /**< @brief Tổng số phần tử hiện có trong bảng băm. */
 
 public:
-    // Initializes a hash table
+    /**
+     * @brief Khởi tạo bảng băm rỗng.
+     */
     HashTable() : elementCount(0) {}
 
-    // Delete copy operations
     HashTable(const HashTable&) = delete;
     HashTable& operator=(const HashTable&) = delete;
 
-    // Destructor to free heap memory
-    ~HashTable() {
-        // buckets' destructors are automatically called
-    }
+    /**
+     * @brief Hủy đối tượng bảng băm.
+     */
+    ~HashTable() {}
 
-    // Inserts a key-value pair into the hash table
+    /**
+     * @brief Chèn một cặp Khóa-Giá trị vào bảng. Nếu Khóa đã tồn tại, cập nhật lại Giá trị.
+     * @param pair Cặp dữ liệu cần chèn.
+     */
     void insert(const Pair<K, V>& pair) {
         int index = getBucketIndex(pair.key);
         Pair<K, V>* existing = buckets[index].find(Pair<K, V>(pair.key));
         if (existing) {
-            existing->value = pair.value;  // Update value if key exists
+            existing->value = pair.value;
         } else {
             buckets[index].insert(pair);
             elementCount++;
         }
     }
 
-    // Removes a key from the hash table
+    /**
+     * @brief Xóa một phần tử ra khỏi bảng băm thông qua khóa.
+     * @param key Khóa cần xóa.
+     * @return true Nếu phần tử tồn tại và đã được xóa.
+     * @return false Nếu phần tử không tồn tại.
+     */
     bool remove(const K& key) {
         int index = getBucketIndex(key);
         Pair<K, V> dummy(key);
@@ -63,7 +88,11 @@ public:
         return false;
     }
 
-    // Finds and returns a pointer to the value associated with the key, or nullptr if not found
+    /**
+     * @brief Tìm kiếm một giá trị theo khóa.
+     * @param key Khóa cần tìm.
+     * @return V* Con trỏ trỏ tới giá trị nếu tìm thấy, hoặc nullptr nếu không tồn tại.
+     */
     V* find(const K& key) {
         int index = getBucketIndex(key);
         Pair<K, V>* found = buckets[index].find(Pair<K, V>(key));
@@ -73,16 +102,25 @@ public:
         return nullptr;
     }
 
-    // Returns true if the key exists in the hash table
+    /**
+     * @brief Kiểm tra xem bảng băm có chứa một khóa cụ thể hay không.
+     * @param key Khóa cần kiểm tra.
+     * @return true Nếu khóa có tồn tại.
+     */
     bool contains(const K& key) {
         int index = getBucketIndex(key);
         return buckets[index].search(Pair<K, V>(key));
     }
 
-    // Returns the number of elements in the hash table
+    /**
+     * @brief Trả về số lượng phần tử hiện tại.
+     * @return int Số phần tử.
+     */
     int size() const { return elementCount; }
 
-    // Removes all elements from the hash table
+    /**
+     * @brief Xóa toàn bộ dữ liệu trong bảng băm.
+     */
     void clear() {
         for (int i = 0; i < TABLE_SIZE; i++) {
             buckets[i].clearTree();
@@ -90,7 +128,10 @@ public:
         elementCount = 0;
     }
 
-    // Returns all elements by traversing each bucket
+    /**
+     * @brief Trả về danh sách tất cả các cặp dữ liệu trong bảng băm (duyệt LNR trên các bucket).
+     * @return Vector<Pair<K, V>> Mảng động chứa tất cả các phần tử.
+     */
     Vector<Pair<K, V>> lnr() {
         Vector<Pair<K, V>> result;
         for (int i = 0; i < TABLE_SIZE; i++) {
@@ -103,12 +144,16 @@ public:
     }
 
 private:
-    // Helper to compute valid bucket index
+    /**
+     * @brief Tính toán chỉ số bucket từ một khóa, sử dụng hàm băm chuẩn của C++.
+     * @param key Khóa cần băm.
+     * @return int Chỉ số của bucket (từ 0 đến TABLE_SIZE - 1).
+     */
     int getBucketIndex(const K& key) const {
-        int h = static_cast<int>(std::hash<K>{}(key)) % TABLE_SIZE;
-        if (h < 0)
-            h += TABLE_SIZE;
-        return h;
+        int bucketIndex = static_cast<int>(std::hash<K>{}(key)) % TABLE_SIZE;
+        if (bucketIndex < 0)
+            bucketIndex += TABLE_SIZE;
+        return bucketIndex;
     }
 };
 

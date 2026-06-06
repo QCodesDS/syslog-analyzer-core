@@ -1,72 +1,122 @@
+/**
+ * @file AVL.hpp
+ * @brief Cài đặt cấu trúc dữ liệu Cây Tìm kiếm Nhị phân Tự cân bằng (AVL Tree).
+ */
+
 #ifndef AVL_HPP
 #define AVL_HPP
 
-#include <algorithm>
-
 #include "Vector.hpp"
 
+/**
+ * @struct AVLNode
+ * @brief Nút (Node) của cây AVL.
+ * @tparam T Kiểu dữ liệu của giá trị lưu trong nút.
+ */
 template<typename T>
 struct AVLNode {
-    T value;
-    AVLNode* left;
-    AVLNode* right;
-    int height;
+    T value;        /**< @brief Giá trị của nút. */
+    AVLNode* left;  /**< @brief Con trỏ tới cây con trái. */
+    AVLNode* right; /**< @brief Con trỏ tới cây con phải. */
+    int height;     /**< @brief Chiều cao của nút. */
 
     AVLNode(const T& val) : value(val), left(nullptr), right(nullptr), height(0) {}
 };
 
+/**
+ * @class AVL
+ * @brief Cây AVL tự cân bằng.
+ * @tparam T Kiểu dữ liệu của các phần tử.
+ */
 template<typename T>
 class AVL {
 private:
-    AVLNode<T>* root;
+    AVLNode<T>* root; /**< @brief Con trỏ tới gốc của cây. */
 
 public:
+    /**
+     * @brief Lấy con trỏ tới nút gốc.
+     * @return AVLNode<T>* Nút gốc của cây.
+     */
     AVLNode<T>* getRoot() const { return root; }
+
+    /**
+     * @brief Lấy chiều cao của cây.
+     * @return int Chiều cao của cây.
+     */
     int height() const { return getHeight(root); }
 
-    // Initializes an empty AVL Tree
+    /**
+     * @brief Khởi tạo cây AVL rỗng.
+     */
     AVL() : root(nullptr) {}
 
-    // Delete copy operations to prevent double free
     AVL(const AVL&) = delete;
     AVL& operator=(const AVL&) = delete;
 
-    // Destructor to free all heap memory
+    /**
+     * @brief Hủy cây và giải phóng bộ nhớ.
+     */
     ~AVL() { clearTree(); }
 
-    // Fully clears the tree
+    /**
+     * @brief Xóa sạch toàn bộ cây.
+     */
     void clearTree() {
         clear(root);
         root = nullptr;
     }
 
-    // Inserts a value into the AVL tree, rebalancing as necessary
+    /**
+     * @brief Chèn một giá trị vào cây.
+     * @param value Giá trị cần chèn.
+     */
     void insert(const T& value) { root = insertNode(root, value); }
 
-    // Removes a value from the AVL tree, rebalancing as necessary
+    /**
+     * @brief Xóa một giá trị khỏi cây.
+     * @param value Giá trị cần xóa.
+     */
     void remove(const T& value) { root = removeNode(root, value); }
 
-    // Searches for a value in the AVL tree
+    /**
+     * @brief Kiểm tra xem một giá trị có tồn tại trong cây hay không.
+     * @param value Giá trị cần tìm.
+     * @return true Nếu tìm thấy.
+     */
     bool search(const T& value) const { return searchNode(root, value); }
 
-    // Finds and returns a pointer to the stored value, or nullptr if not found
+    /**
+     * @brief Tìm và trả về con trỏ tới giá trị trong cây.
+     * @param value Giá trị cần tìm.
+     * @return T* Con trỏ tới giá trị, hoặc nullptr nếu không tìm thấy.
+     */
     T* find(const T& value) { return findNode(root, value); }
 
-    // Returns a vector containing the in-order traversal (LNR) of the AVL tree
+    /**
+     * @brief Duyệt cây theo thứ tự LNR (Left-Node-Right) để lấy danh sách các phần tử tăng dần.
+     * @return Vector<T> Danh sách phần tử.
+     */
     Vector<T> lnr() const {
         Vector<T> result;
         inOrder(root, result);
         return result;
     }
 
-    // Returns a vector containing the pre-order traversal (NLR) of the AVL tree
+    /**
+     * @brief Duyệt cây theo thứ tự NLR (Node-Left-Right).
+     * @return Vector<T> Danh sách phần tử.
+     */
     Vector<T> nlr() const {
         Vector<T> result;
         preOrder(root, result);
         return result;
     }
 
-    // Returns a vector containing the post-order traversal (LRN) of the AVL tree
+    /**
+     * @brief Duyệt cây theo thứ tự LRN (Left-Right-Node).
+     * @return Vector<T> Danh sách phần tử.
+     */
     Vector<T> lrn() const {
         Vector<T> result;
         postOrder(root, result);
@@ -74,64 +124,56 @@ public:
     }
 
 private:
-    // Helper to get the height of a node
     int getHeight(AVLNode<T>* node) const { return node ? node->height : -1; }
 
-    // Helper to get the balance factor of a node
     int getBalanceFactor(AVLNode<T>* node) const {
         if (!node)
             return 0;
         return getHeight(node->right) - getHeight(node->left);
     }
 
-    // Helper to recalculate the height of a node
     void recalculateHeight(AVLNode<T>* node) {
         if (node) {
             node->height = 1 + std::max(getHeight(node->left), getHeight(node->right));
         }
     }
 
-    // Performs a right rotation
-    AVLNode<T>* rotateRight(AVLNode<T>* y) {
-        AVLNode<T>* x = y->left;
-        AVLNode<T>* T2 = x->right;
+    AVLNode<T>* rotateRight(AVLNode<T>* pivotNode) {
+        AVLNode<T>* leftChild = pivotNode->left;
+        AVLNode<T>* rightOfLeftChild = leftChild->right;
 
-        x->right = y;
-        y->left = T2;
+        leftChild->right = pivotNode;
+        pivotNode->left = rightOfLeftChild;
 
-        recalculateHeight(y);
-        recalculateHeight(x);
+        recalculateHeight(pivotNode);
+        recalculateHeight(leftChild);
 
-        return x;
+        return leftChild;
     }
 
-    // Performs a left rotation
-    AVLNode<T>* rotateLeft(AVLNode<T>* x) {
-        AVLNode<T>* y = x->right;
-        AVLNode<T>* T2 = y->left;
+    AVLNode<T>* rotateLeft(AVLNode<T>* pivotNode) {
+        AVLNode<T>* rightChild = pivotNode->right;
+        AVLNode<T>* leftOfRightChild = rightChild->left;
 
-        y->left = x;
-        x->right = T2;
+        rightChild->left = pivotNode;
+        pivotNode->right = leftOfRightChild;
 
-        recalculateHeight(x);
-        recalculateHeight(y);
+        recalculateHeight(pivotNode);
+        recalculateHeight(rightChild);
 
-        return y;
+        return rightChild;
     }
 
-    // Rebalances a node if its balance factor is out of bounds
     AVLNode<T>* rebalance(AVLNode<T>* node) {
         recalculateHeight(node);
         int balance = getBalanceFactor(node);
 
-        // Right heavy
         if (balance > 1) {
             if (getBalanceFactor(node->right) < 0) {
                 node->right = rotateRight(node->right);
             }
             return rotateLeft(node);
         }
-        // Left heavy
         if (balance < -1) {
             if (getBalanceFactor(node->left) > 0) {
                 node->left = rotateLeft(node->left);
@@ -141,7 +183,6 @@ private:
         return node;
     }
 
-    // Helper to insert a node and rebalance
     AVLNode<T>* insertNode(AVLNode<T>* node, const T& value) {
         if (!node)
             return new AVLNode<T>(value);
@@ -150,12 +191,11 @@ private:
         } else if (value > node->value) {
             node->right = insertNode(node->right, value);
         } else {
-            return node;  // Duplicates not allowed or simply ignored
+            return node;
         }
         return rebalance(node);
     }
 
-    // Helper to find the minimum value node in a subtree
     AVLNode<T>* findMin(AVLNode<T>* node) {
         while (node && node->left) {
             node = node->left;
@@ -163,7 +203,6 @@ private:
         return node;
     }
 
-    // Helper to remove a node and rebalance
     AVLNode<T>* removeNode(AVLNode<T>* node, const T& value) {
         if (!node)
             return nullptr;
@@ -190,7 +229,6 @@ private:
         return rebalance(node);
     }
 
-    // Helper to clear the tree
     void clear(AVLNode<T>* node) {
         if (node) {
             clear(node->left);
@@ -199,7 +237,6 @@ private:
         }
     }
 
-    // Helper to search for a value
     bool searchNode(AVLNode<T>* node, const T& value) const {
         if (!node)
             return false;
@@ -210,7 +247,6 @@ private:
         return searchNode(node->right, value);
     }
 
-    // Helper to find a value
     T* findNode(AVLNode<T>* node, const T& value) {
         if (!node)
             return nullptr;
@@ -221,7 +257,6 @@ private:
         return findNode(node->right, value);
     }
 
-    // Helpers for traversal
     void inOrder(AVLNode<T>* node, Vector<T>& vec) const {
         if (node) {
             inOrder(node->left, vec);

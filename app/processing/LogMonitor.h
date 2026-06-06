@@ -1,46 +1,147 @@
+/**
+ * @file LogMonitor.h
+ * @brief Bộ máy phân tích log có lưu trạng thái (stateful) và hệ thống cảnh báo theo ngưỡng.
+ */
+
 #ifndef LOGMONITOR_H
 #define LOGMONITOR_H
-
-#include <stdexcept>
-#include <string>
 
 #include "../../lib/HashTable.hpp"
 #include "../../lib/PriorityQueue.hpp"
 #include "../../lib/Trie.hpp"
-#include "../../lib/Vector.hpp"
 #include "../core/Log.h"
 
+/**
+ * @struct LogSeverityComparator
+ * @brief Bộ so sánh tùy chỉnh dùng cho PriorityQueue để sắp xếp log theo độ nghiêm trọng.
+ */
 struct LogSeverityComparator {
+    /**
+     * @brief Trả về điểm xếp hạng mức độ nghiêm trọng.
+     * @param s Chuỗi mức độ (FATAL, CRITICAL, ERROR, WARN, ...).
+     * @return int Điểm xếp hạng.
+     */
     int severityRank(const std::string& s) const {
         if (s == "FATAL")
-            return 4;
+            return RANK_FATAL;
         if (s == "CRITICAL")
-            return 3;
+            return RANK_CRITICAL;
         if (s == "ERROR")
-            return 2;
+            return RANK_ERROR;
         if (s == "WARN")
-            return 1;
-        return 0;
+            return RANK_WARN;
+        return RANK_DEFAULT;
     }
 
-    // Returns true if a has lower priority than b
+    /**
+     * @brief So sánh hai đối tượng Log dựa trên mức độ nghiêm trọng.
+     * @param a Đối tượng Log thứ nhất.
+     * @param b Đối tượng Log thứ hai.
+     * @return true Nếu mức độ nghiêm trọng của a nhỏ hơn b.
+     */
     bool operator()(const Log& a, const Log& b) const { return severityRank(a.severity) < severityRank(b.severity); }
 };
 
+/**
+ * @class LogMonitor
+ * @brief Theo dõi, phân tích tần suất lỗi, và quản lý các cảnh báo.
+ */
 class LogMonitor {
 private:
-    HashTable<std::string, int> errorCount;
-    Trie keywordFilter;
-    PriorityQueue<Log, LogSeverityComparator> alertQueue;
-    int threshold;
+    HashTable<std::string, int> errorCount;               /**< @brief Bảng băm đếm số lỗi cho từng dịch vụ. */
+    Trie keywordFilter;                                   /**< @brief Bộ lọc Trie chứa các từ khóa quan trọng cần theo dõi. */
+    PriorityQueue<Log, LogSeverityComparator> alertQueue; /**< @brief Hàng đợi ưu tiên lưu các cảnh báo quan trọng nhất. */
+    Vector<std::string> pendingAlerts;                    /**< @brief Danh sách các cảnh báo chuỗi đang chờ để hiển thị. */
+    int threshold;                                        /**< @brief Ngưỡng lỗi kích hoạt cảnh báo dịch vụ. */
+    int fatalCount;                                       /**< @brief Tổng số lỗi FATAL. */
+    int criticalCount;                                    /**< @brief Tổng số lỗi CRITICAL. */
+
+    /**
+     * @brief Tăng bộ đếm lỗi cho một dịch vụ.
+     * @param serviceID Tên dịch vụ.
+     * @return int Số lượng lỗi mới được cập nhật.
+     */
+    int incrementErrorCount(const std::string& serviceID);
+
+    /**
+     * @brief Kiểm tra xem số lượng lỗi đã vượt ngưỡng cảnh báo hay chưa.
+     * @param serviceID Tên dịch vụ.
+     * @param count Số lượng lỗi hiện tại.
+     * @return true Nếu cần kích hoạt cảnh báo.
+     */
+    bool shouldTriggerAlert(const std::string& serviceID, int count);
+
+    /**
+     * @brief Đưa một log mang tính chất nghiêm trọng (FATAL/CRITICAL) vào hệ thống cảnh báo.
+     * @param log Đối tượng Log nghiêm trọng.
+     */
+    void enqueueCriticalLog(const Log& log);
+
+    /**
+     * @brief Định dạng một dòng thống kê số lượng lỗi của dịch vụ.
+     * @param serviceID Tên dịch vụ.
+     * @param count Số lượng lỗi.
+     * @return std::string Chuỗi thống kê đã định dạng.
+     */
+    std::string formatStatLine(const std::string& serviceID, int count);
 
 public:
-    LogMonitor(int alertThreshold = 10);
+    /**
+     * @brief Khởi tạo hệ thống giám sát log.
+     * @param alertThreshold Ngưỡng cảnh báo (mặc định được lấy từ Constants.h).
+     */
+    LogMonitor(int alertThreshold = DEFAULT_ALERT_THRESHOLD);
 
+    /**
+     * @brief Phân tích một dòng log và cập nhật trạng thái bên trong.
+     * @param log Đối tượng Log cần phân tích.
+     */
     void analyzeLog(const Log& log);
+
+    /**
+     * @brief Lấy cảnh báo nghiêm trọng nhất từ hàng đợi.
+     * @return Log Đối tượng Log nghiêm trọng nhất.
+     * @throw std::out_of_range Nếu hàng đợi rỗng.
+     */
     Log getTopAlert();
+
+    /**
+     * @brief Lấy số lượng lỗi hiện tại của một dịch vụ.
+     * @param serviceID Tên dịch vụ.
+     * @return int Số lượng lỗi.
+     */
     int getErrorCount(std::string serviceID);
+
+    /**
+     * @brief Trả về danh sách chuỗi thống kê lỗi cho tất cả các dịch vụ.
+     * @return Vector<std::string> Danh sách thống kê.
+     */
     Vector<std::string> getStats();
+
+    /**
+     * @brief Lấy và xóa sạch danh sách cảnh báo đang chờ xử lý.
+     * @return Vector<std::string> Danh sách các cảnh báo dạng chuỗi.
+     */
+    Vector<std::string> flushAlerts();
+
+    /**
+     * @brief Lấy tổng số lỗi FATAL đã nhận được.
+     * @return int Tổng số lỗi FATAL.
+     */
+    int getFatalCount() const;
+
+    /**
+     * @brief Lấy tổng số lỗi CRITICAL đã nhận được.
+     * @return int Tổng số lỗi CRITICAL.
+     */
+    int getCriticalCount() const;
+
+    /**
+     * @brief Tìm ra dịch vụ tạo ra nhiều lỗi nhất hiện tại.
+     * @param topService Biến tham chiếu lưu tên dịch vụ lỗi nhiều nhất.
+     * @param topCount Biến tham chiếu lưu số lượng lỗi của dịch vụ đó.
+     */
+    void findTopThreat(std::string& topService, int& topCount);
 };
 
 #endif  // LOGMONITOR_H

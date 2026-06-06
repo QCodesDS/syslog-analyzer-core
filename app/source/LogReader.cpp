@@ -1,13 +1,14 @@
-#include "LogReader.h"
+/**
+ * @file LogReader.cpp
+ * @brief Cài đặt các phương thức của lớp LogReader.
+ */
 
-#include <chrono>
-#include <iostream>
-#include <thread>
+#include "LogReader.h"
 
 LogReader::LogReader(const std::string& filename) {
     file.open(filename);
     if (file.is_open()) {
-        lastPos = 0;
+        lastPos = 0;  // Đặt vị trí bắt đầu tại đầu file
     }
 }
 
@@ -21,16 +22,19 @@ Vector<std::string> LogReader::readBatch(int batchSize) {
         return batch;
     }
 
-    file.clear();  // Clear EOF flag
-    file.seekg(lastPos);
+    file.clear();         // Xóa cờ lỗi/EOF để có thể đọc tiếp nếu có dữ liệu mới được thêm vào file
+    file.seekg(lastPos);  // Di chuyển con trỏ tới vị trí đọc cuối cùng
 
     std::string line;
     int count = 0;
+
+    // Đọc từng dòng cho đến khi đạt kích thước lô hoặc hết dữ liệu hiện tại
     while (count < batchSize && std::getline(file, line)) {
         batch.pushBack(line);
         count++;
     }
 
+    // Nếu có dữ liệu mới được đọc, cập nhật lại vị trí con trỏ cuối
     if (batch.getSize() > 0) {
         lastPos = file.tellg();
     }
