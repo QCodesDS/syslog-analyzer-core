@@ -35,11 +35,15 @@ Trong các hệ thống phân tán quy mô lớn, log được sinh ra liên t�
 - **Cảnh báo thông minh:** Quản lý luồng log sự cố bằng `Priority Queue`, đảm bảo các lỗi `FATAL` / `CRITICAL` luôn được đẩy lên ưu tiên xử lý trước các thông báo `INFO`.
 - **Sắp xếp theo thời gian:** Tối ưu hóa việc hiển thị dòng thời gian sự kiện bằng thuật toán `QuickSort`.
 - **Simulate Real-time Logging:** Tích hợp tính năng giả lập (inject) log lỗi trực tiếp để kiểm thử luồng cảnh báo.
+- **Incremental Reading & Polling (Đọc tiếp nối & Thăm dò):** Hệ thống không bao giờ bị "đơ" hay nạp toàn bộ file vào RAM. Cơ chế đọc log theo từng batch (ví dụ 100 dòng), ghi nhớ vị trí con trỏ file (`seekg`/`tellg`). Khi hết file (EOF), tự động tạm nghỉ (Sleep) và thăm dò (Polling) log mới.
+- **Stateful Analysis (Phân tích giữ trạng thái):** Giải quyết bài toán lỗi rải rác ở các batch đọc khác nhau bằng cách lưu trạng thái xuyên suốt qua Hash Table, kích hoạt cảnh báo chính xác khi tổng số lỗi đạt ngưỡng (Threshold) trong cửa sổ thời gian (Time window).
 
 ## 🧠 Kiến thức DSA Áp Dụng
 
 | Cấu trúc / Thuật toán     | Mục đích áp dụng trong dự án                           | Lý do lựa chọn                                                                  |
 | :------------------------ | :----------------------------------------------------- | :------------------------------------------------------------------------------ |
+| **LinkedList**            | Buffer lưu trữ tạm thời các dòng log vừa đọc           | Tối ưu tốc độ chèn/xóa ở hai đầu khi xử lý theo batch (100-200 dòng/lần đọc).   |
+| **BST / AVL Tree**        | Lưu trữ và tra cứu log theo Timestamp (Thời gian)      | Cho phép thực hiện Range Search cực kỳ tối ưu với độ phức tạp $O(\log N)$.      |
 | **Trie**                  | Tìm kiếm từ khóa lỗi (`ERROR`, `FATAL`, `TIMEOUT`,...) | Tối ưu hóa tốc độ tìm kiếm tiền tố (prefix search) trên tập string lớn.         |
 | **Hash Table**            | Đếm tần suất lỗi theo từng dịch vụ                     | Cung cấp khả năng truy xuất và mapping `Service_ID` với độ phức tạp $O(1)$.     |
 | **Priority Queue** (Heap) | Quản lý mức độ nghiêm trọng của log                    | Tự động phân loại và ưu tiên các lỗi nghiêm trọng (`FATAL` > `ERROR` > `WARN`). |
@@ -123,14 +127,13 @@ g++ -std=c++17 app/main.cpp -I lib -o syslog_analyzer
 ./syslog_analyzer
 ```
 
-### 4. Menu Chức năng (Demo)
+### 4. Cơ chế Vận hành Thời gian thực (Real-time Event Loop)
 
-Khi chạy chương trình, bạn sẽ thao tác qua giao diện CLI:
+Chương trình vận hành theo cơ chế Vòng lặp sự kiện thời gian thực (Event Loop). Khi khởi chạy, log sẽ liên tục được 'stream' (chảy) trên màn hình và cập nhật số liệu Dashboard trực tiếp. Người dùng không bị chặn bởi lệnh `cin` mà có thể nhấn các phím tắt (Hotkeys) bất cứ lúc nào để chuyển đổi trạng thái giao diện:
 
-1. **Load log:** Đọc dữ liệu từ thư mục `data/`.
-2. **Search:** Nhập từ khóa để tìm kiếm lỗi nhanh.
-3. **Dashboard:** Hiển thị báo cáo thống kê top các dịch vụ bị lỗi.
-4. **Simulate:** Kích hoạt giả lập inject log lỗi (Ví dụ: `Connection Refused`) để xem cảnh báo Real-time.
+- **Phím `1`**: Chuyển sang chế độ **Live Monitor** (Xem log chạy thời gian thực, lỗi tự động đổi màu ANSI nổi bật).
+- **Phím `2`**: Chuyển sang chế độ **Statistics View** (Xem bảng thống kê tổng quan mà không làm dừng luồng đọc log ngầm).
+- **Phím `Q`**: **Graceful Exit** - Thoát chương trình an toàn (tự động đóng file, giải phóng bộ nhớ, dọn dẹp buffer).
 
 ## 📅 Roadmap Phát triển (2 Tuần)
 
