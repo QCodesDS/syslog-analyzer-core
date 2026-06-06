@@ -203,17 +203,6 @@ syslog-analyzer-core/
 
 ---
 
-## 👥 Phân chia công việc (Team Responsibilities)
-
-_Dự án được cấu trúc theo triết lý làm việc của đội ngũ SRE (Site Reliability Engineering), tách biệt rõ ràng vai trò._
-
-| Nhóm / Vai trò            | Trách nhiệm (Responsibilities)                                                                                                                                                                                                       |
-| :------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Data Engineer** (Dev A) | Chuyên sâu về thuật toán. Chịu trách nhiệm thiết kế hệ thống C++ Templates cho toàn bộ thư mục `lib/` (Trie, HashTable, AVL, Priority Queue). Tối ưu Big-O (nhắm tới $O(1)$ và $O(\log n)$) cùng các bộ test logic Cấu trúc dữ liệu. |
-| **SRE / DevOps** (Dev B)  | Xử lý Event Loop. Tối ưu hóa dung lượng RAM tiêu thụ qua Incremental File Reading, phát triển thuật toán Sliding Time Window nhận dạng Threat (Mối đe dọa). Chịu trách nhiệm hệ thống cảnh báo (Alert) và giao diện CLI.             |
-
----
-
 ## 📜 Giấy phép (License)
 
 Dự án này được phân phối dưới giấy phép **MIT License**. Xem file `LICENSE` để biết thêm chi tiết.
