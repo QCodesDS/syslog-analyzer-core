@@ -48,17 +48,17 @@ Hệ thống hoạt động theo cơ chế **Pipeline**, dữ liệu chảy từ
 
 ```mermaid
 graph TD
-    subgraph Data Input
+    subgraph DataInput ["Data Input"]
         R[Log Reader<br>Incremental File I/O]
     end
 
-    subgraph Core Processing
+    subgraph CoreProcessing ["Core Processing"]
         P[Log Parser<br>Regex Metadata]
         LP[LinkedList Buffer]
         P --> LP
     end
 
-    subgraph Stateful Analysis
+    subgraph StatefulAnalysis ["Stateful Analysis"]
         A[Log Analyzer<br>Aggregator]
         HT[Hash Tables<br>Sliding Windows]
         TR[Trie<br>Keyword Search]
@@ -66,13 +66,13 @@ graph TD
         A --> TR
     end
 
-    subgraph Monitoring & Alerting
+    subgraph MonitoringAlerting ["Monitoring & Alerting"]
         M[Threat Monitor<br>APT Detection]
         PQ[Priority Queue<br>Alert Mgmt]
         M --> PQ
     end
 
-    subgraph Output View
+    subgraph OutputView ["Output View"]
         N[Terminal Renderer<br>Live Dashboard]
     end
 
@@ -81,11 +81,11 @@ graph TD
     A --> M
     PQ --> N
 
-    style Data Input fill:#1A202C,color:#00E676,stroke:#00E676
-    style Core Processing fill:#1A202C,color:#29B6F6,stroke:#29B6F6
-    style Stateful Analysis fill:#1A202C,color:#AB47BC,stroke:#AB47BC
-    style Monitoring & Alerting fill:#1A202C,color:#EF5350,stroke:#EF5350
-    style Output View fill:#1A202C,color:#FFA726,stroke:#FFA726
+    style DataInput fill:#1A202C,color:#00E676,stroke:#00E676
+    style CoreProcessing fill:#1A202C,color:#29B6F6,stroke:#29B6F6
+    style StatefulAnalysis fill:#1A202C,color:#AB47BC,stroke:#AB47BC
+    style MonitoringAlerting fill:#1A202C,color:#EF5350,stroke:#EF5350
+    style OutputView fill:#1A202C,color:#FFA726,stroke:#FFA726
 ```
 
 ---
