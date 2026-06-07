@@ -39,6 +39,14 @@ public:
     static std::string formatIPAlert(const std::string& ip, int count, const Log& lastLog);
 
     /**
+     * @brief Định dạng chuỗi thông báo khi phát hiện cuộc tấn công Botnet phân tán phối hợp.
+     * @param uniqueIps Số lượng IP duy nhất gây lỗi.
+     * @param totalErrors Tổng số lỗi tích lũy trong cửa sổ thời gian.
+     * @return std::string Chuỗi cảnh báo Botnet đã được định dạng.
+     */
+    static std::string formatBotnetAlert(int uniqueIps, int totalErrors);
+
+    /**
      * @brief In trực tiếp thông báo vượt ngưỡng lỗi ra console.
      * @param log Đối tượng log gây ra cảnh báo.
      * @param count Số lượng lỗi hiện tại của dịch vụ.

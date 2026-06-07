@@ -59,6 +59,10 @@ private:
     HashTable<std::string, Queue<long long>> ipTimeWindow; /**< @brief Bảng băm lưu trữ hàng đợi timestamp của các hoạt động lỗi cho mỗi IP nguồn. */
     HashTable<std::string, int> ipErrorCount;              /**< @brief Bảng băm lưu trữ tổng số lỗi của mỗi IP nguồn. */
     int timeWindowSeconds;                                 /**< @brief Độ rộng cửa sổ thời gian (giây) để theo dõi IP. */
+    Queue<Pair<long long, std::string>> globalErrorQueue;  /**< @brief Hàng đợi lỗi toàn cục để phân tích tương quan Botnet. */
+    HashTable<std::string, int> activeIPsInWindow;         /**< @brief Số lỗi được tạo ra bởi mỗi IP trong cửa sổ toàn cục. */
+    int globalTimeWindowSeconds;                           /**< @brief Độ rộng cửa sổ thời gian toàn cục (giây, mặc định 300). */
+    int uniqueIpThreshold;                                 /**< @brief Ngưỡng số lượng IP độc hại duy nhất để phát hiện Botnet. */
 
     /**
      * @brief Tăng bộ đếm lỗi cho một dịch vụ.

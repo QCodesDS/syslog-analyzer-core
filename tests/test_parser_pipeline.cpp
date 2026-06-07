@@ -73,4 +73,39 @@ TEST_SUITE("LogParser") {
         REQUIRE(result == true);
         CHECK(out.message == "User password!@#$% failed");
     }
+
+    TEST_CASE("9. Log Injection Prevention - replaces newlines with [NL]") {
+        Log out;
+        bool result = LogParser::parse("[time] [svc] [ERROR] User admin\n[time] [svc] [INFO] Login success", out);
+        REQUIRE(result == true);
+        CHECK(out.message.find("[NL]") != std::string::npos);
+        CHECK(out.message == "User admin [NL] [time] [svc] [INFO] Login success");
+    }
+
+    TEST_CASE("10. OOM Prevention - truncates log line to 8KB") {
+        Log out;
+        std::string hugeMessage(10000, 'A');
+        std::string input = "[time] [svc] [ERROR] " + hugeMessage;
+        bool result = LogParser::parse(input, out);
+        REQUIRE(result == true);
+        CHECK(out.message.size() <= 8192);
+    }
+
+    TEST_CASE("11. De-obfuscation - decodes Hex/URL and Base64 encoded values in message/severity") {
+        Log out;
+        // Hex \x45\x52\x52\x4f\x52 -> ERROR
+        // Base64 QWNjaWRlbnQ= -> Accident
+        bool result = LogParser::parse("[time] [svc] [\\x45\\x52\\x52\\x4f\\x52] Login failed for user QWNjaWRlbnQ=", out);
+        REQUIRE(result == true);
+        CHECK(out.severity == "ERROR");
+        CHECK(out.message.find("Accident") != std::string::npos);
+        CHECK(out.username == "Accident"); // The username should extract the decoded username
+    }
+
+    TEST_CASE("12. De-obfuscation - decodes URL-encoding %45%52%52%4f%52 -> ERROR") {
+        Log out;
+        bool result = LogParser::parse("[time] [svc] [%45%52%52%4f%52] message", out);
+        REQUIRE(result == true);
+        CHECK(out.severity == "ERROR");
+    }
 }

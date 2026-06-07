@@ -117,3 +117,35 @@ TEST_SUITE("LogMonitor Priority Queue") {
         CHECK_THROWS_AS(monitor.getTopAlert(), std::out_of_range);
     }
 }
+
+TEST_SUITE("LogMonitor Distributed Botnet Detection") {
+    TEST_CASE("1. Multiple unique IPs causing errors - triggers BOTNET ALERT") {
+        LogMonitor monitor(5, 60);
+        Vector<std::string> ips;
+        ips.pushBack("192.168.1.1");
+        ips.pushBack("192.168.1.2");
+        ips.pushBack("192.168.1.3");
+        ips.pushBack("192.168.1.4");
+        ips.pushBack("192.168.1.5");
+
+        for (int i = 0; i < 5; i++) {
+            Log l;
+            l.timestamp = "2026-06-07 00:00:0" + std::to_string(i);
+            l.serviceID = "AuthService";
+            l.severity = "ERROR";
+            l.message = "Login failed for user test";
+            l.sourceIP = ips[i];
+            monitor.analyzeLog(l);
+        }
+
+        Vector<std::string> alerts = monitor.flushAlerts();
+        bool hasBotnetAlert = false;
+        for (int i = 0; i < alerts.getSize(); i++) {
+            if (alerts[i].find("BOTNET ALERT") != std::string::npos || alerts[i].find("Botnet") != std::string::npos) {
+                hasBotnetAlert = true;
+                break;
+            }
+        }
+        CHECK(hasBotnetAlert == true);
+    }
+}

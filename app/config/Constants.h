@@ -25,7 +25,7 @@ static const int KEYBOARD_POLL_INTERVAL_MS = 50;
 
 // --- Cấu hình xử lý Batch ---
 /** @brief Kích thước lô (batch) mặc định khi đọc log từ file. */
-static const int DEFAULT_BATCH_SIZE = 200;
+static const int DEFAULT_BATCH_SIZE = 500;
 /** @brief Hệ số nhân thời gian chờ khi ứng dụng ở trạng thái đọc nhanh (fast mode). */
 static const double FAST_SLEEP_MULTIPLIER = 0.2;
 /** @brief Hệ số nhân thời gian chờ khi ứng dụng ở trạng thái đọc chậm (slow mode). */

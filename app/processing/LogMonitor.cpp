@@ -44,7 +44,8 @@ static long long parseTimestampToUnix(const std::string& timestampStr) {
 }
 
 LogMonitor::LogMonitor(int alertThreshold, int windowSeconds)
-    : threshold(alertThreshold), fatalCount(0), criticalCount(0), timeWindowSeconds(windowSeconds) {
+    : threshold(alertThreshold), fatalCount(0), criticalCount(0), timeWindowSeconds(windowSeconds),
+      globalTimeWindowSeconds(300), uniqueIpThreshold(5) {
     // Thêm các từ khóa cảnh báo quan trọng vào bộ lọc Trie
     keywordFilter.insert("ERROR");
     keywordFilter.insert("FATAL");
@@ -76,9 +77,7 @@ void LogMonitor::enqueueCriticalLog(const Log& log) {
     }
     alertQueue.insert(log);  // Chèn vào hàng đợi ưu tiên theo mức độ nghiêm trọng
     pendingAlerts.pushBack(AlertNotifier::formatCritical(log));
-}
-
-void LogMonitor::analyzeLog(const Log& log) {
+}void LogMonitor::analyzeLog(const Log& log) {
     // Chỉ xử lý và theo dõi nếu mức độ nghiêm trọng trùng với từ khóa cần thiết
     if (keywordFilter.startsWith(log.severity)) {
         int updatedCount = incrementErrorCount(log.serviceID);
@@ -116,6 +115,33 @@ void LogMonitor::analyzeLog(const Log& log) {
                 if (q->size() >= threshold) {
                     pendingAlerts.pushBack(AlertNotifier::formatIPAlert(log.sourceIP, q->size(), log));
                 }
+            }
+
+            // --- PHÁT HIỆN TẤN CÔNG BOTNET PHÂN TÁN (CROSS-IP CORRELATION) ---
+            globalErrorQueue.enqueue(Pair<long long, std::string>(currentTime, log.sourceIP));
+
+            int* currentIpCount = activeIPsInWindow.find(log.sourceIP);
+            int newIpCount = currentIpCount ? (*currentIpCount + 1) : 1;
+            activeIPsInWindow.insert(Pair<std::string, int>(log.sourceIP, newIpCount));
+
+            // Loại bỏ các sự kiện cũ quá globalTimeWindowSeconds (5 phút)
+            while (!globalErrorQueue.empty() && (currentTime - globalErrorQueue.front().key > globalTimeWindowSeconds)) {
+                std::string oldIP = globalErrorQueue.front().value;
+                globalErrorQueue.dequeue();
+                int* countPtr = activeIPsInWindow.find(oldIP);
+                if (countPtr) {
+                    int decr = *countPtr - 1;
+                    if (decr <= 0) {
+                        activeIPsInWindow.remove(oldIP);
+                    } else {
+                        activeIPsInWindow.insert(Pair<std::string, int>(oldIP, decr));
+                    }
+                }
+            }
+
+            int uniqueIps = activeIPsInWindow.size();
+            if (uniqueIps >= uniqueIpThreshold) {
+                pendingAlerts.pushBack(AlertNotifier::formatBotnetAlert(uniqueIps, globalErrorQueue.size()));
             }
         }
     }
