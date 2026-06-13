@@ -130,7 +130,10 @@ public:
         TrieNode* current = root;
         for (char character : word) {
             int charIndex = static_cast<unsigned char>(character);
-            if (charIndex >= 128 || !current->children[charIndex]) {
+            if (charIndex >= 128) {
+                continue;
+            }
+            if (!current->children[charIndex]) {
                 return false;
             }
             current = current->children[charIndex];
@@ -147,7 +150,10 @@ public:
         TrieNode* current = root;
         for (char character : prefix) {
             int charIndex = static_cast<unsigned char>(character);
-            if (charIndex >= 128 || !current->children[charIndex]) {
+            if (charIndex >= 128) {
+                continue;
+            }
+            if (!current->children[charIndex]) {
                 return false;
             }
             current = current->children[charIndex];

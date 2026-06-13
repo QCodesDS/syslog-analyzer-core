@@ -14,7 +14,7 @@ static std::string decodeBase64(const std::string& in) {
     while (padded.length() % 4 != 0) {
         padded += '=';
     }
-    static const std::string b64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    static const char* const b64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     std::string out;
     std::vector<int> T(256, -1);
     for (int i = 0; i < 64; i++) T[b64chars[i]] = i;

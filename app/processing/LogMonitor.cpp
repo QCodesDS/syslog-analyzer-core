@@ -79,7 +79,7 @@ void LogMonitor::enqueueCriticalLog(const Log& log) {
     pendingAlerts.pushBack(AlertNotifier::formatCritical(log));
 }void LogMonitor::analyzeLog(const Log& log) {
     // Chỉ xử lý và theo dõi nếu mức độ nghiêm trọng trùng với từ khóa cần thiết
-    if (keywordFilter.startsWith(log.severity)) {
+    if (keywordFilter.search(log.severity)) {
         int updatedCount = incrementErrorCount(log.serviceID);
 
         // Xử lý các lỗi nghiêm trọng riêng biệt

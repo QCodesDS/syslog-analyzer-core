@@ -96,7 +96,7 @@ public:
     void pushBack(const T& value) {
         if ((this->size + 1) > this->capacity) {
             int oldSize = this->size;
-            this->capacity *= EXPAND_COEFFICIENT;
+            this->capacity = (this->capacity == 0) ? DEFAULT_CAPACITY : (this->capacity * EXPAND_COEFFICIENT);
             T* newArr = new T[this->capacity];
             for (int i = 0; i < oldSize; i++) {
                 newArr[i] = this->arr[i];
@@ -111,7 +111,12 @@ public:
     /**
      * @brief Xóa phần tử cuối cùng ra khỏi Vector.
      */
-    void popBack() { this->size = std::max(this->size - 1, 0); }
+    void popBack() {
+        if (this->size > 0) {
+            this->size--;
+            this->arr[this->size] = T();
+        }
+    }
 
     /**
      * @brief Truy cập phần tử theo chỉ số (cho phép sửa đổi).

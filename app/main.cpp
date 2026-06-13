@@ -136,6 +136,7 @@ int main(int argc, char* argv[]) {
     AppState state = LIVE_MONITOR;
     bool statsViewDirty = false;
     int batchNum = 0;
+    bool isCatchingUp = true;
 
     Vector<std::string> rollingBuffer;
     int totalLogsProcessed = 0;
@@ -174,7 +175,11 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        for (int i = 0; i < printBuffer.getSize(); i++) {
+        int printStart = 0;
+        if (printBuffer.getSize() > MAX_ROLLING_LINES) {
+            printStart = printBuffer.getSize() - MAX_ROLLING_LINES;
+        }
+        for (int i = printStart; i < printBuffer.getSize(); i++) {
             rollingBuffer.pushBack(printBuffer[i]);
         }
         if (rollingBuffer.getSize() > MAX_ROLLING_LINES) {
@@ -220,10 +225,17 @@ int main(int argc, char* argv[]) {
         }
 
         int dynamicSleep = SLEEP_ON_DATA_MS;
-        if (alertCount > 0) {
-            dynamicSleep = SLEEP_ON_ALERT_MS;
-        } else if (!batchHasContent) {
-            dynamicSleep = SLEEP_ON_EOF_MS;
+        if (isCatchingUp) {
+            dynamicSleep = 1;
+            if (!batchHasContent) {
+                isCatchingUp = false;
+            }
+        } else {
+            if (alertCount > 0) {
+                dynamicSleep = SLEEP_ON_ALERT_MS;
+            } else if (!batchHasContent) {
+                dynamicSleep = SLEEP_ON_EOF_MS;
+            }
         }
 
         int sleepDurationMs = static_cast<int>(dynamicSleep * sleepMultiplier);

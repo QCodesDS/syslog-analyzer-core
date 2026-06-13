@@ -150,10 +150,8 @@ private:
      * @return int Chỉ số của bucket (từ 0 đến TABLE_SIZE - 1).
      */
     int getBucketIndex(const K& key) const {
-        int bucketIndex = static_cast<int>(std::hash<K>{}(key)) % TABLE_SIZE;
-        if (bucketIndex < 0)
-            bucketIndex += TABLE_SIZE;
-        return bucketIndex;
+        size_t hashValue = std::hash<K>{}(key);
+        return static_cast<int>(hashValue % static_cast<size_t>(TABLE_SIZE));
     }
 };
 

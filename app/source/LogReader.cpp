@@ -36,7 +36,13 @@ Vector<std::string> LogReader::readBatch(int batchSize) {
 
     // Nếu có dữ liệu mới được đọc, cập nhật lại vị trí con trỏ cuối
     if (batch.getSize() > 0) {
-        lastPos = file.tellg();
+        if (file.eof()) {
+            file.clear();
+        }
+        std::streampos pos = file.tellg();
+        if (pos != std::streampos(-1)) {
+            lastPos = pos;
+        }
     }
 
     return batch;
