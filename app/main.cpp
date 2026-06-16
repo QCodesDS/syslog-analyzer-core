@@ -4,7 +4,6 @@
  */
 #include <chrono>
 #include <iostream>
-#include <string>
 #include <thread>
 
 #include "config/Constants.h"

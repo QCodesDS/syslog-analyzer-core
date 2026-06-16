@@ -1,24 +1,46 @@
+/**
+ * @file Queue.hpp
+ * @brief Cài đặt cấu trúc dữ liệu Hàng đợi (Queue) dựa trên Danh sách liên kết.
+ */
+
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
 
 #include "LinkedList.hpp"
 
+/**
+ * @class Queue
+ * @brief Lớp triển khai Hàng đợi (FIFO).
+ * @tparam T Kiểu dữ liệu của phần tử.
+ */
 template<typename T>
 class Queue {
 private:
+    /// @brief Danh sách liên kết lưu trữ các phần tử của hàng đợi.
     LinkedList<T> list;
 
 public:
-    // Initializes an empty queue
+    /**
+     * @brief Khởi tạo một hàng đợi rỗng.
+     */
     Queue() = default;
 
-    // Destructor (automatically calls LinkedList destructor)
+    /**
+     * @brief Hủy đối tượng hàng đợi (tự động gọi bộ hủy của LinkedList).
+     */
     ~Queue() = default;
 
-    // Copy constructor
+    /**
+     * @brief Constructor sao chép.
+     * @param other Hàng đợi cần sao chép.
+     */
     Queue(const Queue& other) : list(other.list) {}
 
-    // Assignment operator
+    /**
+     * @brief Toán tử gán.
+     * @param other Hàng đợi cần gán.
+     * @return Queue& Tham chiếu tới hàng đợi này.
+     */
     Queue& operator=(const Queue& other) {
         if (this != &other) {
             list = other.list;
@@ -26,10 +48,17 @@ public:
         return *this;
     }
 
-    // Enqueues a value at the back of the queue
+    /**
+     * @brief Thêm một phần tử vào cuối hàng đợi.
+     * @param value Giá trị cần thêm.
+     */
     void enqueue(const T& value) { list.insertBack(value); }
 
-    // Dequeues the front value from the queue
+    /**
+     * @brief Lấy và xóa phần tử ở đầu hàng đợi.
+     * @return true Nếu xóa thành công.
+     * @return false Nếu hàng đợi rỗng.
+     */
     bool dequeue() {
         if (empty())
             return false;
@@ -37,18 +66,29 @@ public:
         return true;
     }
 
-    // Returns a constant reference to the front value of the queue
+    /**
+     * @brief Trả về tham chiếu hằng tới phần tử ở đầu hàng đợi.
+     * @return const T& Tham chiếu tới phần tử đầu.
+     * @throw std::out_of_range Nếu hàng đợi rỗng.
+     */
     const T& front() const {
         if (empty()) {
-            throw std::out_of_range("Queue is empty");
+            throw std::out_of_range("Hàng đợi đang rỗng");
         }
         return list.getHead()->value;
     }
 
-    // Returns true if the queue has no elements
+    /**
+     * @brief Kiểm tra xem hàng đợi có rỗng không.
+     * @return true Nếu rỗng.
+     * @return false Nếu có phần tử.
+     */
     bool empty() const { return list.size() == 0; }
 
-    // Returns the number of elements in the queue
+    /**
+     * @brief Trả về số lượng phần tử trong hàng đợi.
+     * @return int Số phần tử.
+     */
     int size() const { return list.size(); }
 };
 

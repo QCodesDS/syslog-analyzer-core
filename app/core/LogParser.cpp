@@ -5,10 +5,16 @@
 
 #include "LogParser.h"
 
+#include <cctype>
 #include <regex>
 #include <vector>
-#include <cctype>
 
+/**
+ * @brief Giải mã một chuỗi Base64.
+ * 
+ * @param in Chuỗi Base64 đầu vào.
+ * @return std::string Chuỗi sau khi được giải mã.
+ */
 static std::string decodeBase64(const std::string& in) {
     std::string padded = in;
     while (padded.length() % 4 != 0) {
@@ -17,12 +23,14 @@ static std::string decodeBase64(const std::string& in) {
     static const char* const b64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     std::string out;
     std::vector<int> T(256, -1);
-    for (int i = 0; i < 64; i++) T[b64chars[i]] = i;
+    for (int i = 0; i < 64; i++)
+        T[b64chars[i]] = i;
 
     int val = 0, valb = -8;
     for (unsigned char c : padded) {
         if (T[c] == -1) {
-            if (c == '=') break;
+            if (c == '=')
+                break;
             continue;
         }
         val = (val << 6) + T[c];
@@ -35,24 +43,41 @@ static std::string decodeBase64(const std::string& in) {
     return out;
 }
 
+/**
+ * @brief Kiểm tra xem một chuỗi có phải là định dạng Base64 hợp lệ hay không.
+ * 
+ * @param s Chuỗi cần kiểm tra.
+ * @return true Nếu chuỗi là Base64 hợp lệ.
+ * @return false Nếu chuỗi không phải là Base64 hợp lệ.
+ */
 static bool isBase64(const std::string& s) {
-    if (s.length() < 3) return false;
+    if (s.length() < 3)
+        return false;
     int paddingCount = 0;
     for (size_t i = 0; i < s.length(); i++) {
         char c = s[i];
         if (std::isalnum(c) || c == '+' || c == '/') {
-            if (paddingCount > 0) return false;
+            if (paddingCount > 0)
+                return false;
         } else if (c == '=') {
             paddingCount++;
-            if (paddingCount > 2) return false;
+            if (paddingCount > 2)
+                return false;
         } else {
             return false;
         }
     }
-    if (s.length() % 4 == 1) return false;
+    if (s.length() % 4 == 1)
+        return false;
     return true;
 }
 
+/**
+ * @brief Giải mã mã hóa Hex và URL-encoding, đồng thời dọn dẹp kết quả.
+ * 
+ * @param input Chuỗi đầu vào có thể bị mã hóa.
+ * @return std::string Chuỗi đã được giải mã và làm sạch.
+ */
 static std::string decodeObfuscationClean(const std::string& input) {
     // 1. Giải mã hex (\xXX) và URL-encoding (%XX)
     std::string decodedHex;
@@ -60,25 +85,32 @@ static std::string decodeObfuscationClean(const std::string& input) {
     while (i < input.length()) {
         if (input[i] == '\\' && i + 3 < input.length() && (input[i + 1] == 'x' || input[i + 1] == 'X')) {
             std::string hexPart = input.substr(i + 2, 2);
-            try {
-                char chr = static_cast<char>(std::stoi(hexPart, nullptr, 16));
-                decodedHex.push_back(chr);
-            } catch (...) {
+            if (std::isxdigit(static_cast<unsigned char>(hexPart[0])) && std::isxdigit(static_cast<unsigned char>(hexPart[1]))) {
+                try {
+                    char chr = static_cast<char>(std::stoi(hexPart, nullptr, 16));
+                    decodedHex.push_back(chr);
+                } catch (...) {
+                    decodedHex.push_back(input[i]);
+                    decodedHex.push_back(input[i + 1]);
+                    decodedHex.push_back(input[i + 2]);
+                    decodedHex.push_back(input[i + 3]);
+                }
+            } else {
                 decodedHex.push_back(input[i]);
-                decodedHex.push_back(input[i+1]);
-                decodedHex.push_back(input[i+2]);
-                decodedHex.push_back(input[i+3]);
+                decodedHex.push_back(input[i + 1]);
+                decodedHex.push_back(input[i + 2]);
+                decodedHex.push_back(input[i + 3]);
             }
             i += 4;
-        } else if (input[i] == '%' && i + 2 < input.length() && std::isxdigit(input[i+1]) && std::isxdigit(input[i+2])) {
+        } else if (input[i] == '%' && i + 2 < input.length() && std::isxdigit(input[i + 1]) && std::isxdigit(input[i + 2])) {
             std::string hexPart = input.substr(i + 1, 2);
             try {
                 char chr = static_cast<char>(std::stoi(hexPart, nullptr, 16));
                 decodedHex.push_back(chr);
             } catch (...) {
                 decodedHex.push_back(input[i]);
-                decodedHex.push_back(input[i+1]);
-                decodedHex.push_back(input[i+2]);
+                decodedHex.push_back(input[i + 1]);
+                decodedHex.push_back(input[i + 2]);
             }
             i += 3;
         } else {
@@ -103,6 +135,12 @@ static std::string decodeObfuscationClean(const std::string& input) {
     return decodedHex;
 }
 
+/**
+ * @brief Giải mã các dạng làm rối (obfuscation) như Hex, URL-encoding và Base64.
+ * 
+ * @param input Chuỗi đầu vào có thể bị làm rối.
+ * @return std::string Chuỗi đã được giải mã đầy đủ.
+ */
 static std::string decodeObfuscation(const std::string& input) {
     // 1. Giải mã hex (\xXX) và URL-encoding (%XX)
     std::string decodedHex;
@@ -110,25 +148,32 @@ static std::string decodeObfuscation(const std::string& input) {
     while (i < input.length()) {
         if (input[i] == '\\' && i + 3 < input.length() && (input[i + 1] == 'x' || input[i + 1] == 'X')) {
             std::string hexPart = input.substr(i + 2, 2);
-            try {
-                char chr = static_cast<char>(std::stoi(hexPart, nullptr, 16));
-                decodedHex.push_back(chr);
-            } catch (...) {
+            if (std::isxdigit(static_cast<unsigned char>(hexPart[0])) && std::isxdigit(static_cast<unsigned char>(hexPart[1]))) {
+                try {
+                    char chr = static_cast<char>(std::stoi(hexPart, nullptr, 16));
+                    decodedHex.push_back(chr);
+                } catch (...) {
+                    decodedHex.push_back(input[i]);
+                    decodedHex.push_back(input[i + 1]);
+                    decodedHex.push_back(input[i + 2]);
+                    decodedHex.push_back(input[i + 3]);
+                }
+            } else {
                 decodedHex.push_back(input[i]);
-                decodedHex.push_back(input[i+1]);
-                decodedHex.push_back(input[i+2]);
-                decodedHex.push_back(input[i+3]);
+                decodedHex.push_back(input[i + 1]);
+                decodedHex.push_back(input[i + 2]);
+                decodedHex.push_back(input[i + 3]);
             }
             i += 4;
-        } else if (input[i] == '%' && i + 2 < input.length() && std::isxdigit(input[i+1]) && std::isxdigit(input[i+2])) {
+        } else if (input[i] == '%' && i + 2 < input.length() && std::isxdigit(input[i + 1]) && std::isxdigit(input[i + 2])) {
             std::string hexPart = input.substr(i + 1, 2);
             try {
                 char chr = static_cast<char>(std::stoi(hexPart, nullptr, 16));
                 decodedHex.push_back(chr);
             } catch (...) {
                 decodedHex.push_back(input[i]);
-                decodedHex.push_back(input[i+1]);
-                decodedHex.push_back(input[i+2]);
+                decodedHex.push_back(input[i + 1]);
+                decodedHex.push_back(input[i + 2]);
             }
             i += 3;
         } else {
@@ -187,6 +232,14 @@ static std::string decodeObfuscation(const std::string& input) {
     return result;
 }
 
+/**
+ * @brief Phân tích một dòng log thô thành cấu trúc Log.
+ * 
+ * @param rawLine Chuỗi log thô đọc từ file.
+ * @param out Biến tham chiếu lưu đối tượng Log sau khi phân tích thành công.
+ * @return true Nếu phân tích thành công.
+ * @return false Nếu chuỗi log không đúng định dạng.
+ */
 bool LogParser::parse(const std::string& rawLine, Log& out) {
     // 1. Giới hạn độ dài dòng log tối đa 8KB (8192 ký tự) để chống tấn công OOM/Denial of Service
     std::string line = rawLine;
@@ -253,9 +306,10 @@ bool LogParser::parse(const std::string& rawLine, Log& out) {
     // Tiền lọc (Pre-filtering) để tránh ReDoS và tối ưu hiệu năng
     bool hasMaybeIP = (out.message.find('.') != std::string::npos);
     bool hasMaybeUser = false;
-    
+
     std::string lowerMessage = out.message;
-    for (char& c : lowerMessage) c = std::tolower(c);
+    for (char& c : lowerMessage)
+        c = std::tolower(c);
     if (lowerMessage.find("user") != std::string::npos) {
         hasMaybeUser = true;
     }

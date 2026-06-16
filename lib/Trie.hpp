@@ -13,8 +13,10 @@
  * @brief Nút đại diện cho một ký tự trong cây Trie.
  */
 struct TrieNode {
-    TrieNode* children[128]; /**< @brief Mảng con trỏ tới các nút con (hỗ trợ tập ký tự ASCII 128). */
-    bool isEnd;              /**< @brief Đánh dấu nút này có phải là điểm kết thúc của một từ hay không. */
+    /// @brief Mảng con trỏ tới các nút con (hỗ trợ tập ký tự ASCII 128).
+    TrieNode* children[128];
+    /// @brief Đánh dấu nút này có phải là điểm kết thúc của một từ hay không.
+    bool isEnd;
 
     /**
      * @brief Khởi tạo một nút Trie rỗng.
@@ -32,7 +34,8 @@ struct TrieNode {
  */
 class Trie {
 private:
-    TrieNode* root; /**< @brief Nút gốc của cây Trie. */
+    /// @brief Nút gốc của cây Trie.
+    TrieNode* root;
 
     /**
      * @brief Đệ quy xóa toàn bộ các nút con để giải phóng bộ nhớ.
@@ -61,10 +64,15 @@ private:
         }
         TrieNode* newNode = new TrieNode();
         newNode->isEnd = node->isEnd;
-        for (int i = 0; i < 128; i++) {
-            if (node->children[i]) {
-                newNode->children[i] = copyNode(node->children[i]);
+        try {
+            for (int i = 0; i < 128; i++) {
+                if (node->children[i]) {
+                    newNode->children[i] = copyNode(node->children[i]);
+                }
             }
+        } catch (...) {
+            clearNode(newNode);
+            throw;
         }
         return newNode;
     }

@@ -13,12 +13,18 @@
  * @brief Đại diện cho một mục log hệ thống đã được phân tích.
  */
 struct Log {
-    std::string timestamp; /**< @brief Nhãn thời gian của log (vd: "2023-10-12 15:30:45"). */
-    std::string serviceID; /**< @brief Tên dịch vụ sinh ra log (vd: "DBService"). */
-    std::string severity;  /**< @brief Mức độ nghiêm trọng của log (vd: "INFO", "ERROR", "CRITICAL"). */
-    std::string message;   /**< @brief Nội dung thông điệp log chi tiết. */
-    std::string sourceIP;  /**< @brief Địa chỉ IP nguồn trích xuất từ thông điệp log (nếu có). */
-    std::string username;  /**< @brief Tên người dùng trích xuất từ thông điệp log (nếu có). */
+    /// @brief Nhãn thời gian của log (vd: "2023-10-12 15:30:45").
+    std::string timestamp;
+    /// @brief Tên dịch vụ sinh ra log (vd: "DBService").
+    std::string serviceID;
+    /// @brief Mức độ nghiêm trọng của log (vd: "INFO", "ERROR", "CRITICAL").
+    std::string severity;
+    /// @brief Nội dung thông điệp log chi tiết.
+    std::string message;
+    /// @brief Địa chỉ IP nguồn trích xuất từ thông điệp log (nếu có).
+    std::string sourceIP;
+    /// @brief Tên người dùng trích xuất từ thông điệp log (nếu có).
+    std::string username;
 
     /**
      * @brief Trả về chuỗi định dạng của log để hiển thị trực tiếp.

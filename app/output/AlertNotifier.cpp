@@ -21,8 +21,8 @@ std::string AlertNotifier::formatIPAlert(const std::string& ip, int count, const
 }
 
 std::string AlertNotifier::formatBotnetAlert(int uniqueIps, int totalErrors) {
-    return "\033[1;41;37m[BOTNET ALERT]\033[0m Coordinated Botnet/DDoS detected! " + std::to_string(uniqueIps) +
-           " unique IPs generated " + std::to_string(totalErrors) + " errors in the last 5 minutes.";
+    return "\033[1;41;37m[BOTNET ALERT]\033[0m Coordinated Botnet/DDoS detected! " + std::to_string(uniqueIps) + " unique IPs generated " +
+           std::to_string(totalErrors) + " errors in the last 5 minutes.";
 }
 
 void AlertNotifier::notify(const Log& log, int count) {

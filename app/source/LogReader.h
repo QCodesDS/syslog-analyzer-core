@@ -19,8 +19,10 @@
  */
 class LogReader {
 private:
-    std::ifstream file;     /**< @brief Đối tượng luồng đầu vào đọc file. */
-    std::streampos lastPos; /**< @brief Vị trí con trỏ tập tin sau lần đọc cuối để tiếp tục đọc (tailing). */
+    /// @brief Đối tượng luồng đầu vào đọc file.
+    std::ifstream file;
+    /// @brief Vị trí con trỏ tập tin sau lần đọc cuối để tiếp tục đọc (tailing).
+    std::streampos lastPos;
 
 public:
     /**

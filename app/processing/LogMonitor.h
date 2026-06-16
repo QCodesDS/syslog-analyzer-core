@@ -49,20 +49,36 @@ struct LogSeverityComparator {
  */
 class LogMonitor {
 private:
-    HashTable<std::string, int> errorCount;               /**< @brief Bảng băm đếm số lỗi cho từng dịch vụ. */
-    Trie keywordFilter;                                   /**< @brief Bộ lọc Trie chứa các từ khóa quan trọng cần theo dõi. */
-    PriorityQueue<Log, LogSeverityComparator> alertQueue; /**< @brief Hàng đợi ưu tiên lưu các cảnh báo quan trọng nhất. */
-    Vector<std::string> pendingAlerts;                    /**< @brief Danh sách các cảnh báo chuỗi đang chờ để hiển thị. */
-    int threshold;                                        /**< @brief Ngưỡng lỗi kích hoạt cảnh báo dịch vụ. */
-    int fatalCount;                                       /**< @brief Tổng số lỗi FATAL. */
-    int criticalCount;                                    /**< @brief Tổng số lỗi CRITICAL. */
-    HashTable<std::string, Queue<long long>> ipTimeWindow; /**< @brief Bảng băm lưu trữ hàng đợi timestamp của các hoạt động lỗi cho mỗi IP nguồn. */
-    HashTable<std::string, int> ipErrorCount;              /**< @brief Bảng băm lưu trữ tổng số lỗi của mỗi IP nguồn. */
-    int timeWindowSeconds;                                 /**< @brief Độ rộng cửa sổ thời gian (giây) để theo dõi IP. */
-    Queue<Pair<long long, std::string>> globalErrorQueue;  /**< @brief Hàng đợi lỗi toàn cục để phân tích tương quan Botnet. */
-    HashTable<std::string, int> activeIPsInWindow;         /**< @brief Số lỗi được tạo ra bởi mỗi IP trong cửa sổ toàn cục. */
-    int globalTimeWindowSeconds;                           /**< @brief Độ rộng cửa sổ thời gian toàn cục (giây, mặc định 300). */
-    int uniqueIpThreshold;                                 /**< @brief Ngưỡng số lượng IP độc hại duy nhất để phát hiện Botnet. */
+    /// @brief Bảng băm đếm số lỗi cho từng dịch vụ.
+    HashTable<std::string, int> errorCount;
+    /// @brief Bộ lọc Trie chứa các từ khóa quan trọng cần theo dõi.
+    Trie keywordFilter;
+    /// @brief Hàng đợi ưu tiên lưu các cảnh báo quan trọng nhất.
+    PriorityQueue<Log, LogSeverityComparator> alertQueue;
+    /// @brief Danh sách các cảnh báo chuỗi đang chờ để hiển thị.
+    Vector<std::string> pendingAlerts;
+    /// @brief Ngưỡng lỗi kích hoạt cảnh báo dịch vụ.
+    int threshold;
+    /// @brief Tổng số lỗi FATAL.
+    int fatalCount;
+    /// @brief Tổng số lỗi CRITICAL.
+    int criticalCount;
+    /// @brief Bảng băm lưu trữ hàng đợi timestamp của các hoạt động lỗi cho mỗi IP nguồn.
+    HashTable<std::string, Queue<long long>> ipTimeWindow;
+    /// @brief Bảng băm lưu trữ tổng số lỗi của mỗi IP nguồn.
+    HashTable<std::string, int> ipErrorCount;
+    /// @brief Độ rộng cửa sổ thời gian (giây) để theo dõi IP.
+    int timeWindowSeconds;
+    /// @brief Hàng đợi lỗi toàn cục để phân tích tương quan Botnet.
+    Queue<Pair<long long, std::string>> globalErrorQueue;
+    /// @brief Số lỗi được tạo ra bởi mỗi IP trong cửa sổ toàn cục.
+    HashTable<std::string, int> activeIPsInWindow;
+    /// @brief Độ rộng cửa sổ thời gian toàn cục (giây, mặc định 300).
+    int globalTimeWindowSeconds;
+    /// @brief Ngưỡng số lượng IP độc hại duy nhất để phát hiện Botnet.
+    int uniqueIpThreshold;
+    /// @brief Nhãn thời gian Epoch của log cuối cùng được xử lý.
+    long long lastProcessedTimestamp;
 
     /**
      * @brief Tăng bộ đếm lỗi cho một dịch vụ.

@@ -22,8 +22,10 @@
 template<typename T, typename Comp = std::less<T>>
 class PriorityQueue {
 private:
-    Vector<T> elementsHeap; /**< @brief Mảng động dùng làm vùng chứa dữ liệu cho Heap. */
-    Comp comparer;          /**< @brief Bộ so sánh để đánh giá độ ưu tiên. */
+    /// @brief Mảng động dùng làm vùng chứa dữ liệu cho Heap.
+    Vector<T> elementsHeap;
+    /// @brief Bộ so sánh để đánh giá độ ưu tiên.
+    Comp comparer;
 
 public:
     /**

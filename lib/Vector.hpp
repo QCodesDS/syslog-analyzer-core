@@ -6,7 +6,7 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
-#include <algorithm>
+#include <memory>
 #include <stdexcept>
 
 /**
@@ -17,13 +17,20 @@
 template<typename T>
 class Vector {
 private:
-    int capacity; /**< @brief Sức chứa hiện tại của mảng (số lượng phần tử tối đa trước khi phải cấp phát lại). */
-    int size;     /**< @brief Số lượng phần tử thực tế đang lưu trữ. */
-    T* arr;       /**< @brief Con trỏ quản lý vùng nhớ cấp phát động. */
+    /// @brief Sức chứa hiện tại của mảng (số lượng phần tử tối đa trước khi phải cấp phát lại).
+    int capacity;
+    /// @brief Số lượng phần tử thực tế đang lưu trữ.
+    int size;
+    /// @brief Con trỏ quản lý vùng nhớ cấp phát động.
+    T* arr;
+    /// @brief Bộ cấp phát bộ nhớ thô.
+    std::allocator<T> alloc;
 
 public:
-    static constexpr int DEFAULT_CAPACITY = 100; /**< @brief Sức chứa mặc định khi khởi tạo Vector rỗng. */
-    static constexpr int EXPAND_COEFFICIENT = 2; /**< @brief Hệ số mở rộng sức chứa khi mảng đầy. */
+    /// @brief Sức chứa mặc định khi khởi tạo Vector rỗng.
+    static constexpr int DEFAULT_CAPACITY = 100;
+    /// @brief Hệ số mở rộng sức chứa khi mảng đầy.
+    static constexpr int EXPAND_COEFFICIENT = 2;
 
     /**
      * @brief Lấy số lượng phần tử hiện tại.
@@ -37,11 +44,12 @@ public:
      * @param defaultValue Giá trị dùng để khởi tạo tất cả các phần tử.
      */
     Vector(int len, const T& defaultValue) {
-        this->capacity = std::max(len, DEFAULT_CAPACITY);
-        this->arr = new T[this->capacity];
+        int initialCapacity = (len > DEFAULT_CAPACITY) ? len : DEFAULT_CAPACITY;
+        this->capacity = initialCapacity;
+        this->arr = alloc.allocate(this->capacity);
         this->size = len;
         for (int i = 0; i < len; i++) {
-            this->arr[i] = defaultValue;
+            std::allocator_traits<std::allocator<T>>::construct(alloc, &this->arr[i], defaultValue);
         }
     }
 
@@ -49,8 +57,8 @@ public:
      * @brief Khởi tạo Vector rỗng với sức chứa mặc định.
      */
     Vector() {
-        this->arr = new T[DEFAULT_CAPACITY];
         this->capacity = DEFAULT_CAPACITY;
+        this->arr = alloc.allocate(this->capacity);
         this->size = 0;
     }
 
@@ -61,9 +69,13 @@ public:
     Vector(const Vector& other) {
         this->capacity = other.capacity;
         this->size = other.size;
-        this->arr = new T[this->capacity];
-        for (int i = 0; i < this->size; i++) {
-            this->arr[i] = other.arr[i];
+        if (this->capacity > 0) {
+            this->arr = alloc.allocate(this->capacity);
+            for (int i = 0; i < this->size; i++) {
+                std::allocator_traits<std::allocator<T>>::construct(alloc, &this->arr[i], other.arr[i]);
+            }
+        } else {
+            this->arr = nullptr;
         }
     }
 
@@ -74,17 +86,38 @@ public:
      */
     Vector& operator=(const Vector& other) {
         if (this != &other) {
+            Vector temp(other);
+            std::swap(this->capacity, temp.capacity);
+            std::swap(this->size, temp.size);
+            std::swap(this->arr, temp.arr);
+        }
+        return *this;
+    }
+
+    /**
+     * @brief Constructor di chuyển (Move constructor).
+     * @param other Đối tượng Vector cần di chuyển.
+     */
+    Vector(Vector&& other) noexcept : capacity(other.capacity), size(other.size), arr(other.arr) {
+        other.capacity = 0;
+        other.size = 0;
+        other.arr = nullptr;
+    }
+
+    /**
+     * @brief Toán tử gán di chuyển (Move assignment operator).
+     * @param other Đối tượng Vector cần gán di chuyển.
+     * @return Vector& Tham chiếu tới chính đối tượng này sau khi gán.
+     */
+    Vector& operator=(Vector&& other) noexcept {
+        if (this != &other) {
             freeMemory();
             this->capacity = other.capacity;
             this->size = other.size;
-            if (this->capacity > 0) {
-                this->arr = new T[this->capacity];
-                for (int i = 0; i < this->size; i++) {
-                    this->arr[i] = other.arr[i];
-                }
-            } else {
-                this->arr = nullptr;
-            }
+            this->arr = other.arr;
+            other.capacity = 0;
+            other.size = 0;
+            other.arr = nullptr;
         }
         return *this;
     }
@@ -96,15 +129,19 @@ public:
     void pushBack(const T& value) {
         if ((this->size + 1) > this->capacity) {
             int oldSize = this->size;
-            this->capacity = (this->capacity == 0) ? DEFAULT_CAPACITY : (this->capacity * EXPAND_COEFFICIENT);
-            T* newArr = new T[this->capacity];
+            int newCapacity = (this->capacity == 0) ? DEFAULT_CAPACITY : (this->capacity * EXPAND_COEFFICIENT);
+            T* newArr = alloc.allocate(newCapacity);
             for (int i = 0; i < oldSize; i++) {
-                newArr[i] = this->arr[i];
+                std::allocator_traits<std::allocator<T>>::construct(alloc, &newArr[i], std::move(this->arr[i]));
+                std::allocator_traits<std::allocator<T>>::destroy(alloc, &this->arr[i]);
             }
-            delete[] this->arr;
+            if (this->arr) {
+                alloc.deallocate(this->arr, this->capacity);
+            }
             this->arr = newArr;
+            this->capacity = newCapacity;
         }
-        this->arr[this->size] = value;
+        std::allocator_traits<std::allocator<T>>::construct(alloc, &this->arr[this->size], value);
         this->size++;
     }
 
@@ -114,7 +151,7 @@ public:
     void popBack() {
         if (this->size > 0) {
             this->size--;
-            this->arr[this->size] = T();
+            std::allocator_traits<std::allocator<T>>::destroy(alloc, &this->arr[this->size]);
         }
     }
 
@@ -152,14 +189,22 @@ public:
     /**
      * @brief Làm rỗng Vector (đặt kích thước về 0, giữ nguyên sức chứa).
      */
-    void clear() { this->size = 0; }
+    void clear() {
+        for (int i = 0; i < this->size; i++) {
+            std::allocator_traits<std::allocator<T>>::destroy(alloc, &this->arr[i]);
+        }
+        this->size = 0;
+    }
 
     /**
      * @brief Giải phóng hoàn toàn bộ nhớ đã cấp phát.
      */
     void freeMemory() {
         if (this->arr) {
-            delete[] arr;
+            for (int i = 0; i < this->size; i++) {
+                std::allocator_traits<std::allocator<T>>::destroy(alloc, &this->arr[i]);
+            }
+            alloc.deallocate(this->arr, this->capacity);
             this->arr = nullptr;
             this->capacity = 0;
             this->size = 0;

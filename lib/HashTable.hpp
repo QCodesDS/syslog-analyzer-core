@@ -17,8 +17,10 @@
  */
 template<typename K, typename V>
 struct Pair {
-    K key;   /**< @brief Khóa định danh. */
-    V value; /**< @brief Giá trị được lưu trữ. */
+    /// @brief Khóa định danh.
+    K key;
+    /// @brief Giá trị được lưu trữ.
+    V value;
 
     Pair() = default;
     Pair(const K& k, const V& v) : key(k), value(v) {}
@@ -38,15 +40,18 @@ struct Pair {
 template<typename K, typename V>
 class HashTable {
 private:
-    static const int TABLE_SIZE = HASHTABLE_SIZE; /**< @brief Số lượng bucket trong bảng băm. */
-    AVL<Pair<K, V>> buckets[TABLE_SIZE];          /**< @brief Mảng các cây AVL đóng vai trò là các bucket. */
-    int elementCount;                             /**< @brief Tổng số phần tử hiện có trong bảng băm. */
+    /// @brief Số lượng bucket hiện tại.
+    int tableSize;
+    /// @brief Mảng các cây AVL đóng vai trò là các bucket.
+    AVL<Pair<K, V>>* buckets;
+    /// @brief Tổng số phần tử hiện có trong bảng băm.
+    int elementCount;
 
 public:
     /**
      * @brief Khởi tạo bảng băm rỗng.
      */
-    HashTable() : elementCount(0) {}
+    HashTable() : tableSize(HASHTABLE_SIZE), buckets(new AVL<Pair<K, V>>[HASHTABLE_SIZE]), elementCount(0) {}
 
     HashTable(const HashTable&) = delete;
     HashTable& operator=(const HashTable&) = delete;
@@ -54,7 +59,27 @@ public:
     /**
      * @brief Hủy đối tượng bảng băm.
      */
-    ~HashTable() {}
+    ~HashTable() { delete[] buckets; }
+
+    /**
+     * @brief Thay đổi kích thước bảng băm khi hệ số tải vượt ngưỡng.
+     * @param newSize Kích thước mới của bảng băm.
+     */
+    void rehash(int newSize) {
+        AVL<Pair<K, V>>* newBuckets = new AVL<Pair<K, V>>[newSize];
+        for (int i = 0; i < tableSize; i++) {
+            Vector<Pair<K, V>> bucketItems = buckets[i].lnr();
+            for (int j = 0; j < bucketItems.getSize(); j++) {
+                const Pair<K, V>& item = bucketItems[j];
+                size_t hashValue = std::hash<K>{}(item.key);
+                int newIndex = static_cast<int>(hashValue % static_cast<size_t>(newSize));
+                newBuckets[newIndex].insert(item);
+            }
+        }
+        delete[] buckets;
+        buckets = newBuckets;
+        tableSize = newSize;
+    }
 
     /**
      * @brief Chèn một cặp Khóa-Giá trị vào bảng. Nếu Khóa đã tồn tại, cập nhật lại Giá trị.
@@ -66,6 +91,10 @@ public:
         if (existing) {
             existing->value = pair.value;
         } else {
+            if (static_cast<double>(elementCount + 1) / tableSize > 0.75) {
+                rehash(tableSize * 2);
+                index = getBucketIndex(pair.key);
+            }
             buckets[index].insert(pair);
             elementCount++;
         }
@@ -122,7 +151,7 @@ public:
      * @brief Xóa toàn bộ dữ liệu trong bảng băm.
      */
     void clear() {
-        for (int i = 0; i < TABLE_SIZE; i++) {
+        for (int i = 0; i < tableSize; i++) {
             buckets[i].clearTree();
         }
         elementCount = 0;
@@ -134,7 +163,7 @@ public:
      */
     Vector<Pair<K, V>> lnr() {
         Vector<Pair<K, V>> result;
-        for (int i = 0; i < TABLE_SIZE; i++) {
+        for (int i = 0; i < tableSize; i++) {
             Vector<Pair<K, V>> bucketItems = buckets[i].lnr();
             for (int j = 0; j < bucketItems.getSize(); j++) {
                 result.pushBack(bucketItems[j]);
@@ -147,11 +176,11 @@ private:
     /**
      * @brief Tính toán chỉ số bucket từ một khóa, sử dụng hàm băm chuẩn của C++.
      * @param key Khóa cần băm.
-     * @return int Chỉ số của bucket (từ 0 đến TABLE_SIZE - 1).
+     * @return int Chỉ số của bucket (từ 0 đến tableSize - 1).
      */
     int getBucketIndex(const K& key) const {
         size_t hashValue = std::hash<K>{}(key);
-        return static_cast<int>(hashValue % static_cast<size_t>(TABLE_SIZE));
+        return static_cast<int>(hashValue % static_cast<size_t>(tableSize));
     }
 };
 

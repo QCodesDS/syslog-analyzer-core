@@ -44,8 +44,13 @@ static long long parseTimestampToUnix(const std::string& timestampStr) {
 }
 
 LogMonitor::LogMonitor(int alertThreshold, int windowSeconds)
-    : threshold(alertThreshold), fatalCount(0), criticalCount(0), timeWindowSeconds(windowSeconds),
-      globalTimeWindowSeconds(300), uniqueIpThreshold(5) {
+    : threshold(alertThreshold),
+      fatalCount(0),
+      criticalCount(0),
+      timeWindowSeconds(windowSeconds),
+      globalTimeWindowSeconds(300),
+      uniqueIpThreshold(5),
+      lastProcessedTimestamp(0) {
     // Thêm các từ khóa cảnh báo quan trọng vào bộ lọc Trie
     keywordFilter.insert("ERROR");
     keywordFilter.insert("FATAL");
@@ -77,7 +82,8 @@ void LogMonitor::enqueueCriticalLog(const Log& log) {
     }
     alertQueue.insert(log);  // Chèn vào hàng đợi ưu tiên theo mức độ nghiêm trọng
     pendingAlerts.pushBack(AlertNotifier::formatCritical(log));
-}void LogMonitor::analyzeLog(const Log& log) {
+}
+void LogMonitor::analyzeLog(const Log& log) {
     // Chỉ xử lý và theo dõi nếu mức độ nghiêm trọng trùng với từ khóa cần thiết
     if (keywordFilter.search(log.severity)) {
         int updatedCount = incrementErrorCount(log.serviceID);
@@ -95,6 +101,9 @@ void LogMonitor::enqueueCriticalLog(const Log& log) {
         // Theo dõi và phân tích cửa sổ thời gian trượt đối với địa chỉ IP nguồn
         if (!log.sourceIP.empty()) {
             long long currentTime = parseTimestampToUnix(log.timestamp);
+            if (currentTime > lastProcessedTimestamp) {
+                lastProcessedTimestamp = currentTime;
+            }
             Queue<long long>* q = ipTimeWindow.find(log.sourceIP);
             if (!q) {
                 Queue<long long> newQ;
@@ -103,13 +112,21 @@ void LogMonitor::enqueueCriticalLog(const Log& log) {
             }
             if (q) {
                 q->enqueue(currentTime);
-                pruneOldTimestamps(*q, currentTime);
+                int removedCount = 0;
+                while (!q->empty() && (currentTime - q->front() > timeWindowSeconds)) {
+                    q->dequeue();
+                    removedCount++;
+                }
 
-                // Tăng tổng số lỗi của IP nguồn
+                // Cập nhật số lỗi của IP nguồn trong cửa sổ trượt
                 int* existingIPCount = ipErrorCount.find(log.sourceIP);
                 int previousIPCount = existingIPCount ? *existingIPCount : 0;
-                int updatedIPCount = previousIPCount + 1;
-                ipErrorCount.insert(Pair<std::string, int>(log.sourceIP, updatedIPCount));
+                int updatedIPCount = previousIPCount + 1 - removedCount;
+                if (updatedIPCount <= 0) {
+                    ipErrorCount.remove(log.sourceIP);
+                } else {
+                    ipErrorCount.insert(Pair<std::string, int>(log.sourceIP, updatedIPCount));
+                }
 
                 // Kích hoạt cảnh báo nếu số lượng lỗi trong cửa sổ trượt vượt ngưỡng
                 if (q->size() >= threshold) {
@@ -211,9 +228,35 @@ void LogMonitor::findTopThreat(std::string& topService, int& topCount) {
 void LogMonitor::findTopMaliciousIP(std::string& topIP, int& topCount) {
     topIP = "None";
     topCount = 0;
-    Vector<Pair<std::string, int>> items = ipErrorCount.lnr();
 
-    // Tìm kiếm tuyến tính địa chỉ IP gây ra nhiều lỗi nhất
+    // Prune all IP queues using lastProcessedTimestamp to ensure fresh counts
+    if (lastProcessedTimestamp > 0) {
+        Vector<Pair<std::string, Queue<long long>>> ipWindows = ipTimeWindow.lnr();
+        for (int i = 0; i < ipWindows.getSize(); i++) {
+            std::string ip = ipWindows[i].key;
+            Queue<long long>* q = ipTimeWindow.find(ip);
+            if (q) {
+                int removedCount = 0;
+                while (!q->empty() && (lastProcessedTimestamp - q->front() > timeWindowSeconds)) {
+                    q->dequeue();
+                    removedCount++;
+                }
+                if (removedCount > 0) {
+                    int* countPtr = ipErrorCount.find(ip);
+                    if (countPtr) {
+                        int updated = *countPtr - removedCount;
+                        if (updated <= 0) {
+                            ipErrorCount.remove(ip);
+                        } else {
+                            ipErrorCount.insert(Pair<std::string, int>(ip, updated));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Vector<Pair<std::string, int>> items = ipErrorCount.lnr();
     for (int i = 0; i < items.getSize(); i++) {
         if (items[i].value > topCount) {
             topCount = items[i].value;

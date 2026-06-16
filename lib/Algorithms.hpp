@@ -1,9 +1,21 @@
+/**
+ * @file Algorithms.hpp
+ * @brief Tập hợp các thuật toán sắp xếp và tìm kiếm cơ bản.
+ */
+
 #ifndef ALGORITHMS_HPP
 #define ALGORITHMS_HPP
 
 #include "Vector.hpp"
 
-// Sorts elements using the Bubble Sort algorithm
+/**
+ * @brief Sắp xếp các phần tử sử dụng thuật toán Nổi bọt (Bubble Sort).
+ * 
+ * @tparam T Kiểu dữ liệu của các phần tử.
+ * @tparam Comp Kiểu của hàm so sánh.
+ * @param arr Danh sách các phần tử cần sắp xếp.
+ * @param cmp Hàm so sánh tùy chỉnh (mặc định là std::less).
+ */
 template<typename T, typename Comp = std::less<T>>
 void bubbleSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
     int n = arr.getSize();
@@ -22,7 +34,14 @@ void bubbleSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
     }
 }
 
-// Sorts elements using the Selection Sort algorithm
+/**
+ * @brief Sắp xếp các phần tử sử dụng thuật toán Sắp xếp Chọn (Selection Sort).
+ * 
+ * @tparam T Kiểu dữ liệu của các phần tử.
+ * @tparam Comp Kiểu của hàm so sánh.
+ * @param arr Danh sách các phần tử cần sắp xếp.
+ * @param cmp Hàm so sánh tùy chỉnh (mặc định là std::less).
+ */
 template<typename T, typename Comp = std::less<T>>
 void selectionSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
     int n = arr.getSize();
@@ -41,7 +60,14 @@ void selectionSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
     }
 }
 
-// Sorts elements using the Insertion Sort algorithm
+/**
+ * @brief Sắp xếp các phần tử sử dụng thuật toán Sắp xếp Chèn (Insertion Sort).
+ * 
+ * @tparam T Kiểu dữ liệu của các phần tử.
+ * @tparam Comp Kiểu của hàm so sánh.
+ * @param arr Danh sách các phần tử cần sắp xếp.
+ * @param cmp Hàm so sánh tùy chỉnh (mặc định là std::less).
+ */
 template<typename T, typename Comp = std::less<T>>
 void insertionSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
     int n = arr.getSize();
@@ -56,7 +82,16 @@ void insertionSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
     }
 }
 
-// Helper for heapSort to maintain heap property
+/**
+ * @brief Hàm hỗ trợ cho heapSort để duy trì tính chất của Heap.
+ * 
+ * @tparam T Kiểu dữ liệu của các phần tử.
+ * @tparam Comp Kiểu của hàm so sánh.
+ * @param arr Danh sách các phần tử.
+ * @param n Kích thước của heap.
+ * @param i Chỉ số của gốc (root) hiện tại.
+ * @param cmp Hàm so sánh.
+ */
 template<typename T, typename Comp>
 void heapify(Vector<T>& arr, int n, int i, Comp cmp) {
     int largest = i;
@@ -77,7 +112,14 @@ void heapify(Vector<T>& arr, int n, int i, Comp cmp) {
     }
 }
 
-// Sorts elements using the Heap Sort algorithm
+/**
+ * @brief Sắp xếp các phần tử sử dụng thuật toán Heap Sort.
+ * 
+ * @tparam T Kiểu dữ liệu của các phần tử.
+ * @tparam Comp Kiểu của hàm so sánh.
+ * @param arr Danh sách các phần tử cần sắp xếp.
+ * @param cmp Hàm so sánh tùy chỉnh (mặc định là std::less).
+ */
 template<typename T, typename Comp = std::less<T>>
 void heapSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
     int n = arr.getSize();
@@ -92,7 +134,17 @@ void heapSort(Vector<T>& arr, Comp cmp = std::less<T>()) {
     }
 }
 
-// Helper for quickSort to partition the array
+/**
+ * @brief Hàm hỗ trợ cho quickSort để phân hoạch mảng.
+ * 
+ * @tparam T Kiểu dữ liệu của các phần tử.
+ * @tparam Comp Kiểu của hàm so sánh.
+ * @param arr Danh sách các phần tử.
+ * @param lo Chỉ số bắt đầu.
+ * @param hi Chỉ số kết thúc.
+ * @param cmp Hàm so sánh.
+ * @return int Chỉ số của phần tử chốt (pivot) sau khi phân hoạch.
+ */
 template<typename T, typename Comp>
 int partition(Vector<T>& arr, int lo, int hi, Comp cmp) {
     T pivot = arr[hi];
@@ -111,7 +163,16 @@ int partition(Vector<T>& arr, int lo, int hi, Comp cmp) {
     return i + 1;
 }
 
-// Sorts elements using the Quick Sort algorithm
+/**
+ * @brief Sắp xếp các phần tử sử dụng thuật toán Quick Sort.
+ * 
+ * @tparam T Kiểu dữ liệu của các phần tử.
+ * @tparam Comp Kiểu của hàm so sánh.
+ * @param arr Danh sách các phần tử cần sắp xếp.
+ * @param lo Chỉ số bắt đầu.
+ * @param hi Chỉ số kết thúc.
+ * @param cmp Hàm so sánh.
+ */
 template<typename T, typename Comp = std::less<T>>
 void quickSort(Vector<T>& arr, int lo, int hi, Comp cmp = std::less<T>()) {
     if (lo < hi) {
@@ -121,7 +182,17 @@ void quickSort(Vector<T>& arr, int lo, int hi, Comp cmp = std::less<T>()) {
     }
 }
 
-// Helper for mergeSort to merge two halves
+/**
+ * @brief Hàm hỗ trợ cho mergeSort để trộn hai nửa mảng đã sắp xếp.
+ * 
+ * @tparam T Kiểu dữ liệu của các phần tử.
+ * @tparam Comp Kiểu của hàm so sánh.
+ * @param arr Danh sách các phần tử.
+ * @param lo Chỉ số bắt đầu nửa trái.
+ * @param mid Chỉ số kết thúc nửa trái (và giữa).
+ * @param hi Chỉ số kết thúc nửa phải.
+ * @param cmp Hàm so sánh.
+ */
 template<typename T, typename Comp>
 void merge(Vector<T>& arr, int lo, int mid, int hi, Comp cmp) {
     int n1 = mid - lo + 1;
@@ -158,7 +229,16 @@ void merge(Vector<T>& arr, int lo, int mid, int hi, Comp cmp) {
     }
 }
 
-// Sorts elements using the Merge Sort algorithm
+/**
+ * @brief Sắp xếp các phần tử sử dụng thuật toán Merge Sort.
+ * 
+ * @tparam T Kiểu dữ liệu của các phần tử.
+ * @tparam Comp Kiểu của hàm so sánh.
+ * @param arr Danh sách các phần tử cần sắp xếp.
+ * @param lo Chỉ số bắt đầu.
+ * @param hi Chỉ số kết thúc.
+ * @param cmp Hàm so sánh tùy chỉnh.
+ */
 template<typename T, typename Comp = std::less<T>>
 void mergeSort(Vector<T>& arr, int lo, int hi, Comp cmp = std::less<T>()) {
     if (lo < hi) {
@@ -169,7 +249,14 @@ void mergeSort(Vector<T>& arr, int lo, int hi, Comp cmp = std::less<T>()) {
     }
 }
 
-// Searches for a key using Linear Search, returns index or -1
+/**
+ * @brief Tìm kiếm tuần tự (Linear Search) một giá trị trong mảng.
+ * 
+ * @tparam T Kiểu dữ liệu của phần tử.
+ * @param arr Danh sách các phần tử.
+ * @param key Giá trị cần tìm kiếm.
+ * @return int Chỉ số của phần tử nếu tìm thấy, hoặc -1 nếu không tìm thấy.
+ */
 template<typename T>
 int linearSearch(const Vector<T>& arr, const T& key) {
     for (int i = 0; i < arr.getSize(); i++) {
@@ -179,7 +266,14 @@ int linearSearch(const Vector<T>& arr, const T& key) {
     return -1;
 }
 
-// Searches for a key using Binary Search (assumes sorted), returns index or -1
+/**
+ * @brief Tìm kiếm nhị phân (Binary Search) một giá trị trong mảng đã sắp xếp.
+ * 
+ * @tparam T Kiểu dữ liệu của phần tử.
+ * @param arr Danh sách các phần tử đã được sắp xếp.
+ * @param key Giá trị cần tìm kiếm.
+ * @return int Chỉ số của phần tử nếu tìm thấy, hoặc -1 nếu không tìm thấy.
+ */
 template<typename T>
 int binarySearch(const Vector<T>& arr, const T& key) {
     int lo = 0;

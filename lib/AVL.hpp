@@ -15,10 +15,14 @@
  */
 template<typename T>
 struct AVLNode {
-    T value;        /**< @brief Giá trị của nút. */
-    AVLNode* left;  /**< @brief Con trỏ tới cây con trái. */
-    AVLNode* right; /**< @brief Con trỏ tới cây con phải. */
-    int height;     /**< @brief Chiều cao của nút. */
+    /// @brief Giá trị của nút.
+    T value;
+    /// @brief Con trỏ tới cây con trái.
+    AVLNode* left;
+    /// @brief Con trỏ tới cây con phải.
+    AVLNode* right;
+    /// @brief Chiều cao của nút.
+    int height;
 
     AVLNode(const T& val) : value(val), left(nullptr), right(nullptr), height(0) {}
 };
@@ -31,7 +35,8 @@ struct AVLNode {
 template<typename T>
 class AVL {
 private:
-    AVLNode<T>* root; /**< @brief Con trỏ tới gốc của cây. */
+    /// @brief Con trỏ tới gốc của cây.
+    AVLNode<T>* root;
 
 public:
     /**
@@ -124,20 +129,41 @@ public:
     }
 
 private:
+    /**
+     * @brief Lấy chiều cao của một nút.
+     * @param node Nút cần lấy chiều cao.
+     * @return int Chiều cao của nút.
+     */
     int getHeight(AVLNode<T>* node) const { return node ? node->height : -1; }
 
+    /**
+     * @brief Lấy hệ số cân bằng của một nút.
+     * @param node Nút cần lấy hệ số cân bằng.
+     * @return int Hệ số cân bằng.
+     */
     int getBalanceFactor(AVLNode<T>* node) const {
         if (!node)
             return 0;
         return getHeight(node->right) - getHeight(node->left);
     }
 
+    /**
+     * @brief Tính toán lại chiều cao của một nút dựa trên các nút con.
+     * @param node Nút cần tính lại chiều cao.
+     */
     void recalculateHeight(AVLNode<T>* node) {
         if (node) {
-            node->height = 1 + std::max(getHeight(node->left), getHeight(node->right));
+            int leftH = getHeight(node->left);
+            int rightH = getHeight(node->right);
+            node->height = 1 + (leftH > rightH ? leftH : rightH);
         }
     }
 
+    /**
+     * @brief Xoay phải cây tại một nút chốt.
+     * @param pivotNode Nút chốt.
+     * @return AVLNode<T>* Nút gốc mới sau khi xoay.
+     */
     AVLNode<T>* rotateRight(AVLNode<T>* pivotNode) {
         AVLNode<T>* leftChild = pivotNode->left;
         AVLNode<T>* rightOfLeftChild = leftChild->right;
@@ -151,6 +177,11 @@ private:
         return leftChild;
     }
 
+    /**
+     * @brief Xoay trái cây tại một nút chốt.
+     * @param pivotNode Nút chốt.
+     * @return AVLNode<T>* Nút gốc mới sau khi xoay.
+     */
     AVLNode<T>* rotateLeft(AVLNode<T>* pivotNode) {
         AVLNode<T>* rightChild = pivotNode->right;
         AVLNode<T>* leftOfRightChild = rightChild->left;
@@ -164,6 +195,11 @@ private:
         return rightChild;
     }
 
+    /**
+     * @brief Cân bằng lại cây tại một nút.
+     * @param node Nút cần cân bằng.
+     * @return AVLNode<T>* Nút gốc mới của cây con sau khi cân bằng.
+     */
     AVLNode<T>* rebalance(AVLNode<T>* node) {
         recalculateHeight(node);
         int balance = getBalanceFactor(node);
@@ -183,6 +219,12 @@ private:
         return node;
     }
 
+    /**
+     * @brief Chèn một nút mới vào cây con.
+     * @param node Nút gốc của cây con.
+     * @param value Giá trị cần chèn.
+     * @return AVLNode<T>* Nút gốc mới của cây con.
+     */
     AVLNode<T>* insertNode(AVLNode<T>* node, const T& value) {
         if (!node)
             return new AVLNode<T>(value);
@@ -196,6 +238,11 @@ private:
         return rebalance(node);
     }
 
+    /**
+     * @brief Tìm nút có giá trị nhỏ nhất trong cây con.
+     * @param node Nút gốc của cây con.
+     * @return AVLNode<T>* Nút chứa giá trị nhỏ nhất.
+     */
     AVLNode<T>* findMin(AVLNode<T>* node) {
         while (node && node->left) {
             node = node->left;
@@ -203,6 +250,12 @@ private:
         return node;
     }
 
+    /**
+     * @brief Xóa một nút khỏi cây con.
+     * @param node Nút gốc của cây con.
+     * @param value Giá trị cần xóa.
+     * @return AVLNode<T>* Nút gốc mới của cây con sau khi xóa.
+     */
     AVLNode<T>* removeNode(AVLNode<T>* node, const T& value) {
         if (!node)
             return nullptr;
@@ -229,6 +282,10 @@ private:
         return rebalance(node);
     }
 
+    /**
+     * @brief Xóa sạch cây con giải phóng bộ nhớ.
+     * @param node Nút gốc của cây con.
+     */
     void clear(AVLNode<T>* node) {
         if (node) {
             clear(node->left);
@@ -237,6 +294,13 @@ private:
         }
     }
 
+    /**
+     * @brief Tìm kiếm một giá trị trong cây con.
+     * @param node Nút gốc của cây con.
+     * @param value Giá trị cần tìm.
+     * @return true Nếu tìm thấy.
+     * @return false Nếu không tìm thấy.
+     */
     bool searchNode(AVLNode<T>* node, const T& value) const {
         if (!node)
             return false;
@@ -247,6 +311,12 @@ private:
         return searchNode(node->right, value);
     }
 
+    /**
+     * @brief Tìm và trả về con trỏ tới giá trị trong cây con.
+     * @param node Nút gốc của cây con.
+     * @param value Giá trị cần tìm.
+     * @return T* Con trỏ tới giá trị, hoặc nullptr.
+     */
     T* findNode(AVLNode<T>* node, const T& value) {
         if (!node)
             return nullptr;
@@ -257,6 +327,11 @@ private:
         return findNode(node->right, value);
     }
 
+    /**
+     * @brief Duyệt cây theo thứ tự LNR (In-order).
+     * @param node Nút gốc của cây con.
+     * @param vec Vector lưu trữ kết quả duyệt.
+     */
     void inOrder(AVLNode<T>* node, Vector<T>& vec) const {
         if (node) {
             inOrder(node->left, vec);
@@ -265,6 +340,11 @@ private:
         }
     }
 
+    /**
+     * @brief Duyệt cây theo thứ tự NLR (Pre-order).
+     * @param node Nút gốc của cây con.
+     * @param vec Vector lưu trữ kết quả duyệt.
+     */
     void preOrder(AVLNode<T>* node, Vector<T>& vec) const {
         if (node) {
             vec.pushBack(node->value);
@@ -273,6 +353,11 @@ private:
         }
     }
 
+    /**
+     * @brief Duyệt cây theo thứ tự LRN (Post-order).
+     * @param node Nút gốc của cây con.
+     * @param vec Vector lưu trữ kết quả duyệt.
+     */
     void postOrder(AVLNode<T>* node, Vector<T>& vec) const {
         if (node) {
             postOrder(node->left, vec);

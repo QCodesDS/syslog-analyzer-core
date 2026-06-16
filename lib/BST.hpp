@@ -1,66 +1,119 @@
+/**
+ * @file BST.hpp
+ * @brief Cài đặt cấu trúc dữ liệu Cây Tìm kiếm Nhị phân (Binary Search Tree).
+ */
+
 #ifndef BST_HPP
 #define BST_HPP
 
 #include "Vector.hpp"
 
+/**
+ * @struct BSTNode
+ * @brief Nút (Node) của cây tìm kiếm nhị phân.
+ * @tparam T Kiểu dữ liệu của giá trị lưu trong nút.
+ */
 template<typename T>
 struct BSTNode {
+    /// @brief Giá trị của nút.
     T value;
+    /// @brief Con trỏ tới cây con trái.
     BSTNode* left;
+    /// @brief Con trỏ tới cây con phải.
     BSTNode* right;
-    int height;  // set to 0 for reuse in AVL
+    /// @brief Chiều cao (dùng lại cho AVL).
+    int height;
 
+    /**
+     * @brief Constructor khởi tạo nút với một giá trị.
+     * @param val Giá trị để khởi tạo nút.
+     */
     BSTNode(const T& val) : value(val), left(nullptr), right(nullptr), height(0) {}
 };
 
+/**
+ * @class BST
+ * @brief Lớp triển khai Cây Tìm kiếm Nhị phân.
+ * @tparam T Kiểu dữ liệu của phần tử.
+ */
 template<typename T>
 class BST {
 private:
+    /// @brief Con trỏ tới gốc của cây.
     BSTNode<T>* root;
 
 public:
+    /**
+     * @brief Lấy con trỏ tới nút gốc.
+     * @return BSTNode<T>* Con trỏ gốc của cây.
+     */
     BSTNode<T>* getRoot() const { return root; }
 
-    // Initializes an empty Binary Search Tree
+    /**
+     * @brief Khởi tạo cây rỗng.
+     */
     BST() : root(nullptr) {}
 
-    // Delete copy operations to prevent double free
     BST(const BST&) = delete;
     BST& operator=(const BST&) = delete;
 
-    // Destructor to free all heap memory
+    /**
+     * @brief Hủy cây và giải phóng bộ nhớ.
+     */
     ~BST() { clearTree(); }
 
-    // Fully clears the tree
+    /**
+     * @brief Xóa sạch toàn bộ cây.
+     */
     void clearTree() {
         clear(root);
         root = nullptr;
     }
 
-    // Inserts a value into the BST
+    /**
+     * @brief Chèn một giá trị vào cây.
+     * @param value Giá trị cần chèn.
+     */
     void insert(const T& value) { root = insertNode(root, value); }
 
-    // Removes a value from the BST
+    /**
+     * @brief Xóa một giá trị khỏi cây.
+     * @param value Giá trị cần xóa.
+     */
     void remove(const T& value) { root = removeNode(root, value); }
 
-    // Searches for a value in the BST
+    /**
+     * @brief Tìm kiếm một giá trị trong cây.
+     * @param value Giá trị cần tìm.
+     * @return true Nếu tìm thấy.
+     * @return false Nếu không tìm thấy.
+     */
     bool search(const T& value) const { return searchNode(root, value); }
 
-    // Returns a vector containing the in-order traversal (LNR) of the BST
+    /**
+     * @brief Duyệt cây theo thứ tự LNR (In-order).
+     * @return Vector<T> Danh sách phần tử đã duyệt.
+     */
     Vector<T> lnr() const {
         Vector<T> result;
         inOrder(root, result);
         return result;
     }
 
-    // Returns a vector containing the pre-order traversal (NLR) of the BST
+    /**
+     * @brief Duyệt cây theo thứ tự NLR (Pre-order).
+     * @return Vector<T> Danh sách phần tử đã duyệt.
+     */
     Vector<T> nlr() const {
         Vector<T> result;
         preOrder(root, result);
         return result;
     }
 
-    // Returns a vector containing the post-order traversal (LRN) of the BST
+    /**
+     * @brief Duyệt cây theo thứ tự LRN (Post-order).
+     * @return Vector<T> Danh sách phần tử đã duyệt.
+     */
     Vector<T> lrn() const {
         Vector<T> result;
         postOrder(root, result);
@@ -68,7 +121,10 @@ public:
     }
 
 private:
-    // Helper to clear the tree
+    /**
+     * @brief Hàm hỗ trợ để xóa sạch cây con.
+     * @param node Nút gốc của cây con.
+     */
     void clear(BSTNode<T>* node) {
         if (node) {
             clear(node->left);
@@ -77,7 +133,12 @@ private:
         }
     }
 
-    // Helper to insert a node
+    /**
+     * @brief Hàm hỗ trợ chèn một nút mới.
+     * @param node Nút gốc của cây con.
+     * @param value Giá trị cần chèn.
+     * @return BSTNode<T>* Nút gốc mới của cây con.
+     */
     BSTNode<T>* insertNode(BSTNode<T>* node, const T& value) {
         if (!node)
             return new BSTNode<T>(value);
@@ -89,7 +150,11 @@ private:
         return node;
     }
 
-    // Helper to find the minimum value node in a subtree
+    /**
+     * @brief Hàm hỗ trợ tìm nút nhỏ nhất trong cây con.
+     * @param node Nút gốc của cây con.
+     * @return BSTNode<T>* Nút chứa giá trị nhỏ nhất.
+     */
     BSTNode<T>* findMin(BSTNode<T>* node) {
         while (node && node->left) {
             node = node->left;
@@ -97,7 +162,12 @@ private:
         return node;
     }
 
-    // Helper to remove a node
+    /**
+     * @brief Hàm hỗ trợ xóa một nút.
+     * @param node Nút gốc của cây con.
+     * @param value Giá trị cần xóa.
+     * @return BSTNode<T>* Nút gốc mới của cây con.
+     */
     BSTNode<T>* removeNode(BSTNode<T>* node, const T& value) {
         if (!node)
             return nullptr;
@@ -124,7 +194,13 @@ private:
         return node;
     }
 
-    // Helper to search for a value
+    /**
+     * @brief Hàm hỗ trợ tìm kiếm giá trị.
+     * @param node Nút gốc của cây con.
+     * @param value Giá trị cần tìm.
+     * @return true Nếu tìm thấy.
+     * @return false Nếu không tìm thấy.
+     */
     bool searchNode(BSTNode<T>* node, const T& value) const {
         if (!node)
             return false;
@@ -135,7 +211,11 @@ private:
         return searchNode(node->right, value);
     }
 
-    // Helpers for traversal
+    /**
+     * @brief Hàm hỗ trợ duyệt cây LNR.
+     * @param node Nút gốc của cây con.
+     * @param vec Vector kết quả.
+     */
     void inOrder(BSTNode<T>* node, Vector<T>& vec) const {
         if (node) {
             inOrder(node->left, vec);
@@ -144,6 +224,11 @@ private:
         }
     }
 
+    /**
+     * @brief Hàm hỗ trợ duyệt cây NLR.
+     * @param node Nút gốc của cây con.
+     * @param vec Vector kết quả.
+     */
     void preOrder(BSTNode<T>* node, Vector<T>& vec) const {
         if (node) {
             vec.pushBack(node->value);
@@ -152,6 +237,11 @@ private:
         }
     }
 
+    /**
+     * @brief Hàm hỗ trợ duyệt cây LRN.
+     * @param node Nút gốc của cây con.
+     * @param vec Vector kết quả.
+     */
     void postOrder(BSTNode<T>* node, Vector<T>& vec) const {
         if (node) {
             postOrder(node->left, vec);

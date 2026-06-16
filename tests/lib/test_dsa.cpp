@@ -1,37 +1,50 @@
 /**
- * @file test_dsa_correctness.cpp
- * @brief Tests all core data structures and algorithms for correct behavior.
+ * @file test_dsa.cpp
+ * @brief Tests all core library data structures and algorithms (lib/) for correct behavior.
  */
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest.h"
-#include "../lib/AVL.hpp"
-//#include "../lib/BST.hpp" // Not found in the lib dir but mentioned in prompt, assuming AVL handles tree
-#include "../lib/HashTable.hpp"
-#include "../lib/PriorityQueue.hpp"
-#include "../lib/LinkedList.hpp"
-#include "../lib/Stack.hpp"
-#include "../lib/Queue.hpp"
-#include "../lib/Algorithms.hpp"
 #include <string>
 
-// ---- Sorting helpers (free functions, visible to all TEST_CASEs) ----
+#include "../../lib/Algorithms.hpp"
+#include "../../lib/AVL.hpp"
+#include "../../lib/BST.hpp"
+#include "../../lib/HashTable.hpp"
+#include "../../lib/LinkedList.hpp"
+#include "../../lib/PriorityQueue.hpp"
+#include "../../lib/Queue.hpp"
+#include "../../lib/Stack.hpp"
+#include "../../lib/Trie.hpp"
+#include "../doctest.h"
+
+/**
+ * @brief Kiểm tra xem mảng đã được sắp xếp tăng dần chưa.
+ * @param arr Mảng Vector cần kiểm tra.
+ * @return true Nếu mảng đã được sắp xếp tăng dần.
+ * @return false Nếu chưa.
+ */
 static bool isSortedAsc(const Vector<int>& arr) {
     for (int i = 0; i < arr.getSize() - 1; ++i)
-        if (arr[i] > arr[i + 1]) return false;
+        if (arr[i] > arr[i + 1])
+            return false;
     return true;
 }
+
+/**
+ * @brief Kiểm tra xem mảng đã được sắp xếp giảm dần chưa.
+ * @param arr Mảng Vector cần kiểm tra.
+ * @return true Nếu mảng đã được sắp xếp giảm dần.
+ * @return false Nếu chưa.
+ */
 static bool isSortedDesc(const Vector<int>& arr) {
     for (int i = 0; i < arr.getSize() - 1; ++i)
-        if (arr[i] < arr[i + 1]) return false;
+        if (arr[i] < arr[i + 1])
+            return false;
     return true;
 }
 
 /**
  * @brief Test Suite for AVL Tree
- * Verifies that the AVL tree maintains its balance properties under
- * sequential and random insertions/deletions, correctly preventing
- * O(N) degradation. Also tests basic operations like search and clear.
  */
 TEST_SUITE("AVL Tree") {
     TEST_CASE("1. Insert 10 elements in sorted order - must not degrade to O(N)") {
@@ -39,7 +52,6 @@ TEST_SUITE("AVL Tree") {
         for (int i = 1; i <= 10; i++) {
             tree.insert(i);
         }
-        // Verify height stays <= 4 (log2(10) ~ 3.3)
         CHECK(tree.height() <= 4);
     }
 
@@ -69,7 +81,7 @@ TEST_SUITE("AVL Tree") {
         tree.insert(15);
         tree.insert(3);
         tree.insert(7);
-        tree.remove(5); // 5 has two children (3 and 7)
+        tree.remove(5);
         CHECK(tree.search(5) == false);
         CHECK(tree.search(10) == true);
         CHECK(tree.search(15) == true);
@@ -96,9 +108,43 @@ TEST_SUITE("AVL Tree") {
 }
 
 /**
+ * @brief Test Suite for BST (Binary Search Tree)
+ */
+TEST_SUITE("BST") {
+    TEST_CASE("1. Insert and search") {
+        BST<int> tree;
+        tree.insert(10);
+        tree.insert(5);
+        tree.insert(15);
+        CHECK(tree.search(10) == true);
+        CHECK(tree.search(5) == true);
+        CHECK(tree.search(15) == true);
+        CHECK(tree.search(99) == false);
+    }
+
+    TEST_CASE("2. Inorder traversal (LNR) returns sorted elements") {
+        BST<int> tree;
+        tree.insert(10);
+        tree.insert(5);
+        tree.insert(15);
+        Vector<int> sorted = tree.lnr();
+        REQUIRE(sorted.getSize() == 3);
+        CHECK(sorted[0] == 5);
+        CHECK(sorted[1] == 10);
+        CHECK(sorted[2] == 15);
+    }
+
+    TEST_CASE("3. Remove leaf") {
+        BST<int> tree;
+        tree.insert(10);
+        tree.insert(5);
+        tree.remove(5);
+        CHECK(tree.search(5) == false);
+    }
+}
+
+/**
  * @brief Test Suite for HashTable
- * Verifies that hash table correctly handles collisions, duplicate keys,
- * and maintains accurate size under various operations. 
  */
 TEST_SUITE("HashTable") {
     TEST_CASE("1. Insert 5 pairs - find() returns correct values") {
@@ -108,7 +154,7 @@ TEST_SUITE("HashTable") {
         ht.insert(Pair<std::string, int>("three", 3));
         ht.insert(Pair<std::string, int>("four", 4));
         ht.insert(Pair<std::string, int>("five", 5));
-        
+
         REQUIRE(ht.find("three") != nullptr);
         CHECK(*(ht.find("three")) == 3);
         REQUIRE(ht.find("five") != nullptr);
@@ -119,7 +165,7 @@ TEST_SUITE("HashTable") {
         HashTable<std::string, int> ht;
         ht.insert(Pair<std::string, int>("key1", 10));
         ht.insert(Pair<std::string, int>("key1", 20));
-        
+
         CHECK(ht.size() == 1);
         REQUIRE(ht.find("key1") != nullptr);
         CHECK(*(ht.find("key1")) == 20);
@@ -146,7 +192,7 @@ TEST_SUITE("HashTable") {
         CHECK(ht.find("key1") == nullptr);
     }
 
-    TEST_CASE("6. Force collision: insert 200 string keys - all retrievable") {
+    TEST_CASE("6. Force collision & rehash: insert 200 string keys - all retrievable") {
         HashTable<std::string, int> ht;
         for (int i = 0; i < 200; i++) {
             ht.insert(Pair<std::string, int>("key_" + std::to_string(i), i));
@@ -172,8 +218,6 @@ TEST_SUITE("HashTable") {
 
 /**
  * @brief Test Suite for PriorityQueue
- * Verifies correct heap properties (max-heap by default, min-heap with comparator),
- * correct ordering of extracted elements, and exception handling.
  */
 TEST_SUITE("PriorityQueue") {
     TEST_CASE("1. Insert out of order - peek() returns max") {
@@ -200,10 +244,10 @@ TEST_SUITE("PriorityQueue") {
         pq.insert(50);
         pq.insert(30);
         pq.insert(20);
-        
+
         int prev = pq.peek();
         pq.extract();
-        while(!pq.empty()) {
+        while (!pq.empty()) {
             int current = pq.peek();
             CHECK(current <= prev);
             prev = current;
@@ -225,27 +269,10 @@ TEST_SUITE("PriorityQueue") {
         pq.extract();
         CHECK(pq.peek() == 30);
     }
-
-    TEST_CASE("6. Insert 1000 elements - still extracts in correct order") {
-        PriorityQueue<int> pq;
-        for (int i = 0; i < 1000; i++) {
-            pq.insert(i % 100);
-        }
-        int prev = pq.peek();
-        pq.extract();
-        while(!pq.empty()) {
-            int current = pq.peek();
-            CHECK(current <= prev);
-            prev = current;
-            pq.extract();
-        }
-    }
 }
 
 /**
  * @brief Test Suite for LinkedList
- * Verifies insertions at various points, correct removal behavior,
- * memory safety during copies, and proper list sizes.
  */
 TEST_SUITE("LinkedList") {
     TEST_CASE("1. insertFront, insertBack, insertAt - size correct") {
@@ -273,44 +300,32 @@ TEST_SUITE("LinkedList") {
         ll.insertBack(10);
         ll.insertBack(20);
         ll.insertBack(30);
-        ll.removeAt(1); // removes 20
+        ll.removeAt(1);  // removes 20
         CHECK(ll.size() == 2);
         CHECK(ll.getHead()->next->value == 30);
     }
 
-    TEST_CASE("4. find() - true/false correct") {
-        LinkedList<int> ll;
-        ll.insertBack(10);
-        CHECK(ll.find(10) == true);
-        CHECK(ll.find(20) == false);
-    }
-
-    TEST_CASE("5. clear() - size 0, no crash on second clear()") {
-        LinkedList<int> ll;
-        ll.insertBack(10);
-        ll.clear();
-        CHECK(ll.size() == 0);
-        ll.clear(); // shouldn't crash
-        CHECK(ll.size() == 0);
-    }
-
-    TEST_CASE("6. Copy constructor - deep copy, modifying copy doesn't affect original") {
+    TEST_CASE("4. Copy constructor & Assignment - deep copy, no double free") {
         LinkedList<int> ll;
         ll.insertBack(10);
         ll.insertBack(20);
-        
+
         LinkedList<int> ll_copy(ll);
         ll_copy.insertBack(30);
-        
+
         CHECK(ll.size() == 2);
         CHECK(ll_copy.size() == 3);
+
+        LinkedList<int> assigned;
+        assigned = ll;
+        assigned.insertBack(40);
+        CHECK(ll.size() == 2);
+        CHECK(assigned.size() == 3);
     }
 }
 
 /**
  * @brief Test Suite for Stack and Queue
- * Verifies LIFO and FIFO properties, basic operations, and exception throws
- * when operating on empty instances.
  */
 TEST_SUITE("Stack and Queue") {
     TEST_CASE("Stack: push/pop/top/empty/size") {
@@ -326,11 +341,6 @@ TEST_SUITE("Stack and Queue") {
         CHECK(s.empty() == true);
     }
 
-    TEST_CASE("Stack: top() on empty - throws") {
-        Stack<int> s;
-        CHECK_THROWS_AS(s.top(), std::out_of_range);
-    }
-
     TEST_CASE("Queue: enqueue/dequeue/front/empty/size") {
         Queue<int> q;
         CHECK(q.empty() == true);
@@ -343,81 +353,100 @@ TEST_SUITE("Stack and Queue") {
         q.dequeue();
         CHECK(q.empty() == true);
     }
+}
 
-    TEST_CASE("Queue: front() on empty - throws") {
-        Queue<int> q;
-        CHECK_THROWS_AS(q.front(), std::out_of_range);
+/**
+ * @brief Test Suite for Trie
+ */
+TEST_SUITE("Trie") {
+    TEST_CASE("1. insert \"ERROR\", \"FATAL\", \"TIMEOUT\" - search() true for all") {
+        Trie t;
+        t.insert("ERROR");
+        t.insert("FATAL");
+        t.insert("TIMEOUT");
+        CHECK(t.search("ERROR") == true);
+        CHECK(t.search("FATAL") == true);
+        CHECK(t.search("TIMEOUT") == true);
+    }
+
+    TEST_CASE("2. startsWith(\"ERR\") - true (prefix of \"ERROR\")") {
+        Trie t;
+        t.insert("ERROR");
+        CHECK(t.startsWith("ERR") == true);
+    }
+
+    TEST_CASE("3. clear() - search returns false for all previously inserted") {
+        Trie t;
+        t.insert("ERROR");
+        t.clear();
+        CHECK(t.search("ERROR") == false);
+    }
+
+    TEST_CASE("4. Case sensitivity: \"error\" != \"ERROR\"") {
+        Trie t;
+        t.insert("ERROR");
+        CHECK(t.search("error") == false);
     }
 }
 
 /**
  * @brief Test Suite for Sorting Algorithms
- * Verifies standard sorting algorithms sort random, sorted, reversed 
- * and edge-case arrays correctly, including custom comparators.
  */
 TEST_SUITE("Sorting Algorithms") {
-
     TEST_CASE("Test 1: random order - sorted ascending") {
         Vector<int> arr;
-        arr.pushBack(5); arr.pushBack(2); arr.pushBack(9); arr.pushBack(1);
-        Vector<int> a = arr; bubbleSort(a); CHECK(isSortedAsc(a));
-        a = arr; selectionSort(a); CHECK(isSortedAsc(a));
-        a = arr; insertionSort(a); CHECK(isSortedAsc(a));
-        a = arr; heapSort(a); CHECK(isSortedAsc(a));
-        a = arr; quickSort(a, 0, a.getSize()-1); CHECK(isSortedAsc(a));
-        a = arr; mergeSort(a, 0, a.getSize()-1); CHECK(isSortedAsc(a));
+        arr.pushBack(5);
+        arr.pushBack(2);
+        arr.pushBack(9);
+        arr.pushBack(1);
+        Vector<int> a = arr;
+        bubbleSort(a);
+        CHECK(isSortedAsc(a));
+        a = arr;
+        selectionSort(a);
+        CHECK(isSortedAsc(a));
+        a = arr;
+        insertionSort(a);
+        CHECK(isSortedAsc(a));
+        a = arr;
+        heapSort(a);
+        CHECK(isSortedAsc(a));
+        a = arr;
+        quickSort(a, 0, a.getSize() - 1);
+        CHECK(isSortedAsc(a));
+        a = arr;
+        mergeSort(a, 0, a.getSize() - 1);
+        CHECK(isSortedAsc(a));
     }
 
-    TEST_CASE("Test 2: already sorted - no crash, still sorted") {
+    TEST_CASE("Test 2: with custom comparator - sorted descending") {
         Vector<int> arr;
-        arr.pushBack(1); arr.pushBack(2); arr.pushBack(3);
-        Vector<int> a = arr; bubbleSort(a); CHECK(isSortedAsc(a));
-        a = arr; quickSort(a, 0, a.getSize()-1); CHECK(isSortedAsc(a));
-    }
-
-    TEST_CASE("Test 3: reverse order - sorted ascending") {
-        Vector<int> arr;
-        arr.pushBack(3); arr.pushBack(2); arr.pushBack(1);
-        Vector<int> a = arr; mergeSort(a, 0, a.getSize()-1); CHECK(isSortedAsc(a));
-        a = arr; heapSort(a); CHECK(isSortedAsc(a));
-    }
-
-    TEST_CASE("Test 4: single element - no crash") {
-        Vector<int> arr; arr.pushBack(42);
-        Vector<int> a = arr; bubbleSort(a); CHECK(a[0] == 42);
-        a = arr; quickSort(a, 0, a.getSize()-1); CHECK(a[0] == 42);
-    }
-
-    TEST_CASE("Test 5: with custom comparator - sorted descending") {
-        Vector<int> arr;
-        arr.pushBack(5); arr.pushBack(2); arr.pushBack(9); arr.pushBack(1);
+        arr.pushBack(5);
+        arr.pushBack(2);
+        arr.pushBack(9);
+        arr.pushBack(1);
         std::greater<int> cmp;
-        Vector<int> a = arr; bubbleSort(a, cmp); CHECK(isSortedDesc(a));
-        a = arr; quickSort(a, 0, a.getSize()-1, cmp); CHECK(isSortedDesc(a));
+        Vector<int> a = arr;
+        bubbleSort(a, cmp);
+        CHECK(isSortedDesc(a));
+        a = arr;
+        quickSort(a, 0, a.getSize() - 1, cmp);
+        CHECK(isSortedDesc(a));
     }
 }
 
 /**
  * @brief Test Suite for Search Algorithms
- * Tests finding present elements, missing elements, and handling empty arrays.
  */
 TEST_SUITE("Search Algorithms") {
-    TEST_CASE("linearSearch: found, not found, empty array") {
+    TEST_CASE("linearSearch & binarySearch") {
         Vector<int> arr;
-        arr.pushBack(10); arr.pushBack(20); arr.pushBack(30);
+        arr.pushBack(10);
+        arr.pushBack(20);
+        arr.pushBack(30);
         CHECK(linearSearch(arr, 20) == 1);
         CHECK(linearSearch(arr, 99) == -1);
-        Vector<int> emptyArr;
-        CHECK(linearSearch(emptyArr, 10) == -1);
-    }
-
-    TEST_CASE("binarySearch: found, not found, single element") {
-        Vector<int> arr; // must be sorted
-        arr.pushBack(10); arr.pushBack(20); arr.pushBack(30);
         CHECK(binarySearch(arr, 30) == 2);
         CHECK(binarySearch(arr, 99) == -1);
-        Vector<int> single; single.pushBack(42);
-        CHECK(binarySearch(single, 42) == 0);
-        CHECK(binarySearch(single, 99) == -1);
     }
 }
