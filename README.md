@@ -157,17 +157,17 @@ Hệ thống cung cấp giao diện **Live Dashboard** hiển thị trực tiế
 syslog-analyzer-core/
 ├── Makefile                # Kịch bản biên dịch tối ưu tự động
 ├── README.md               # Tài liệu hướng dẫn dự án (File này)
-├── reports.tex             # Báo cáo đồ án môn học bằng LaTeX
+├── Report.pdf              # Báo cáo đồ án môn học
 ├── assets/                 # Chứa logo trường và hình ảnh minh họa
 ├── lib/                    # 📚 THƯ VIỆN CẤU TRÚC DỮ LIỆU ĐỘC LẬP (TEMPLATES)
-│   ├── Vector.hpp          # Mảng động
-│   ├── LinkedList.hpp      # Danh sách liên kết đôi
-│   ├── Stack.hpp / Queue.hpp # Ngăn xếp & Hàng đợi
-│   ├── PriorityQueue.hpp   # Hàng đợi ưu tiên (Binary Max-Heap)
-│   ├── BST.hpp / AVL.hpp   # Cây BST và Cây tự cân bằng AVL
-│   ├── HashTable.hpp       # Bảng băm lai cấu trúc cây AVL
-│   ├── Trie.hpp            # Cây tiền tố tra cứu từ khóa nhanh
-│   └── Algorithms.hpp      # Các thuật toán sắp xếp & tìm kiếm tổng quát
+│   ├── Vector.hpp
+│   ├── LinkedList.hpp
+│   ├── Stack.hpp / Queue.hpp
+│   ├── PriorityQueue.hpp
+│   ├── BST.hpp / AVL.hpp
+│   ├── HashTable.hpp
+│   ├── Trie.hpp
+│   └── Algorithms.hpp
 ├── app/                    # 🎯 TẦNG ỨNG DỤNG XỬ LÝ (APPLICATION LAYER)
 │   ├── core/               # Trình Log, LogParser (Giải mã Hex/Base64)
 │   ├── processing/         # LogAnalyzer, LogMonitor (Sliding Window)

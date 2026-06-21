@@ -12,6 +12,7 @@
 #include <string>
 
 #include "../../lib/Vector.hpp"
+#include "../config/Constants.h"
 
 /**
  * @class LogReader
@@ -39,10 +40,10 @@ public:
     /**
      * @brief Đọc một số lượng dòng log nhất định từ file.
      * 
-     * @param batchSize Số lượng dòng tối đa cần đọc trong một lô (mặc định: 200).
+     * @param batchSize Số lượng dòng tối đa cần đọc trong một lô..
      * @return Vector<std::string> Danh sách các dòng log vừa đọc được.
      */
-    Vector<std::string> readBatch(int batchSize = 200);
+    Vector<std::string> readBatch(int batchSize = DEFAULT_BATCH_SIZE);
 
     /**
      * @brief Kiểm tra xem luồng file còn khả dụng không.
